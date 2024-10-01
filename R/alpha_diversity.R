@@ -15,17 +15,19 @@ Richness <- function(x, detection = 1e-5) {
 }
 
 
-# calculate all alpha diversity matrices and return dataframe
 
+#' Calculate alpha-diversity indices from a phyloseq object
+#'
 #' @param ps phyloseq object
-#' @indices Alpha-diversity indices to calculate. Supported metrics are `"Richness"`,`"Shannon.Effective"`, `"Shannon"` and `"Inverse.Simpson"`
+#' @param indices Alpha-diversity indices to calculate. Supported metrics are `"Richness"`,`"Shannon.Effective"`, `"Shannon"` and `"Inverse.Simpson"`
 #' @return Returns the specified alpha diversity metrics for each sample as a dataframe
 #'
 #' @examples
+#'
 #' data(zeller_2014)
 #' alpha_div <- alpha_div(zeller_2014)
 #' Only richness
-#' alpha_div <- alpha_div(zeller_2014, indices=c("Richness))
+#' alpha_div <- alpha_div(zeller_2014, indices=c("Richness"))
 #' @export
 calc_alpha <- function(ps, indices=c("Richness",
                                      "Shannon.Effective",

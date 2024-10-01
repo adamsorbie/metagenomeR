@@ -1,11 +1,12 @@
-# XY formula
-#' @param ps phyloseq object
-#' @return Returns the taxonomy table slot as a dataframe
-#' @export
+#' Create a Formula for Linear Models
 #'
-#' @examples
-#' data(dietswap)
-#' taxa <- taxonomy(dietswap)
+#' This function generates a formula to be used in linear models or statistical tests. It constructs the formula in the format `y ~ x1 + x2 + ...`.
+#'
+#' @param y_var A character string representing the dependent variable.
+#' @param x_vars A character vector of independent variables.
+#'
+#' @return A formula object of the form `y_var ~ x_vars`.
+#'
 #' @keywords internal
 xyform <- function (y_var, x_vars) {
   # y_var: a length-one character vector
@@ -13,15 +14,20 @@ xyform <- function (y_var, x_vars) {
   as.formula(sprintf("%s ~ %s", y_var, paste(x_vars, collapse = " + ")))
 }
 
-# check sample sizes for paired test
-#' @param ps phyloseq object
-#' @return Returns the taxonomy table slot as a dataframe
-#' @export
+#' Check if Sample Sizes are Equal Across Groups
+#'
+#' This function checks whether the sample sizes for each group in a specified column of a data frame are equal.
+#'
+#' @param df A data frame containing the data.
+#' @param variable_col A character string representing the column with groupings to check for equal sample sizes.
+#'
+#' @return A logical value: `TRUE` if all groups have equal sample sizes, and `FALSE` otherwise.
 #'
 #' @examples
-#' data(dietswap)
-#' taxa <- taxonomy(dietswap)
-#' @keywords internal
+#' # Example usage:
+#' equal_sizes <- check_equal_sample_sizes(df, "group_column")
+#'
+#' @export
 check_equal_sample_sizes <- function(df, variable_col) {
   # Count the number of occurrences for each group
   sample_sizes <- df %>%
@@ -37,7 +43,26 @@ check_equal_sample_sizes <- function(df, variable_col) {
   }
 }
 
-#
+#' Perform Statistical Tests and create dataframe to add to plot results
+#'
+#' This function performs statistical tests (such as Wilcoxon, Kruskal-Wallis, or Friedman) on a data frame based on the provided formula. It also checks for paired tests and multiple groups.
+#'
+#' @param df A data frame containing the data.
+#' @param formula A formula specifying the relationship between dependent and independent variables.
+#' @param variable_col A character string representing the column with groupings.
+#' @param assume_normality A logical value indicating whether to assume normality for parametric tests. Default is `FALSE`.
+#' @param multiple_groups A logical value indicating whether multiple groups are present. Default is `FALSE`.
+#' @param paired A logical value indicating whether the test is paired. Default is `FALSE`.
+#'
+#' @return A data frame with the statistical test results, including p-values and significance.
+#'
+#' @note The function will stop if the sample sizes for paired tests are not equal.
+#'
+#' @examples
+#' # Example usage:
+#' stat_results <- stat_plot(df, formula = y ~ x, variable_col = "group")
+#'
+#' @export
 stat_plot <- function(df, formula, variable_col, assume_normality=F, multiple_groups=F, paired=F) {
 
   # Check paired
@@ -94,7 +119,32 @@ stat_plot <- function(df, formula, variable_col, assume_normality=F, multiple_gr
   }
 }
 
-# plot boxplot with stats
+#' Plot Boxplot with Statistical Significance
+#'
+#' This function generates a boxplot for a given data frame and performs statistical tests to visualize significance. It supports plotting for paired or unpaired tests with options for multiple groups.
+#'
+#' @param df A data frame containing the data to be plotted.
+#' @param variable_col A character string representing the independent variable column in the data frame.
+#' @param value_col A character string representing the dependent variable column in the data frame.
+#' @param comparisons_list A list of comparisons to be made for significance testing.
+#' @param fill_var A character string specifying the variable to use for filling the boxplot. Default is the same as `variable_col`.
+#' @param xlab A character string for the x-axis label. Default is the same as `variable_col`.
+#' @param ylab A character string for the y-axis label. Default is the same as `value_col`.
+#' @param p_title A character string for the plot title. Default is `NULL`.
+#' @param multiple_groups A logical value indicating if the plot contains multiple groups. Default is `FALSE`.
+#' @param cols A vector of colors for the boxplot. Default is `NULL`.
+#' @param group.order A character vector specifying the order of the groups. Default is `NULL`.
+#' @param paired A logical value indicating if the test is paired. Default is `FALSE`.
+#' @param normal A logical value indicating if normality should be assumed. Default is `FALSE`.
+#' @param ... Additional arguments passed to the plotting functions.
+#'
+#' @return A ggplot object representing the boxplot with optional statistical significance annotations.
+#'
+#' @examples
+#' # Example usage:
+#' plot <- plot_boxplot(df, "group", "value", comparisons_list = list(c("A", "B")))
+#'
+#' @export
 plot_boxplot <- function(df,
                          variable_col,
                          value_col,
@@ -152,6 +202,7 @@ plot_boxplot <- function(df,
       color = variable_col
     )
   ) +
+    # could maybe just add if clause here and convert this function into general purpose plotting
     geom_boxplot(
       color = "black",
       alpha = 0.8,
@@ -208,8 +259,28 @@ plot_boxplot <- function(df,
 }
 
 
-
-# plot scatter plot with correlation if desired
+#' Plot Scatter Plot with Optional Correlation
+#'
+#' This function generates a scatter plot with an optional linear regression line and calculates correlation statistics if specified.
+#'
+#' @param df A data frame containing the data to be plotted.
+#' @param x A character string representing the column to be used for the x-axis.
+#' @param y A character string representing the column to be used for the y-axis.
+#' @param point_color A character string specifying the color of the points.
+#' @param line_color A character string specifying the color of the regression line.
+#' @param fill_color A character string specifying the fill color of the regression line.
+#' @param xlab A character string for the x-axis label.
+#' @param ylab A character string for the y-axis label.
+#' @param corr.method A character string specifying the correlation method (e.g., `"pearson"`, `"spearman"`, `"kendall"`). Default is `NULL`.
+#' @param ... Additional arguments passed to the `stat_cor` function for correlation statistics.
+#'
+#' @return A ggplot object representing the scatter plot, with optional correlation results.
+#'
+#' @examples
+#' # Example usage:
+#' plot <- plot_scatter(df, x = "height", y = "weight", point_color = "blue", line_color = "red", fill_color = "lightblue", xlab = "Height", ylab = "Weight", corr.method = "pearson")
+#'
+#' @export
 plot_scatter <- function(df,
                          x,
                          y,
@@ -247,7 +318,23 @@ plot_scatter <- function(df,
 }
 
 
-
+#' Plot PCA (Principal Component Analysis) for Functional Profile
+#'
+#' This function calculates and plots a PCA from a functional profile with metadata, optionally adding ellipses for grouping.
+#'
+#' @param func_profile A list containing functional profiles and corresponding metadata.
+#' @param what A character string specifying which part of the functional profile to use for PCA.
+#' @param var A character string specifying the grouping variable in the metadata.
+#' @param colours A vector of colors to use for the groups.
+#' @param add_ellipse A logical value indicating whether to add ellipses around the groups. Default is `FALSE`.
+#'
+#' @return A ggplot object representing the PCA plot.
+#'
+#' @examples
+#' # Example usage:
+#' pca_plot <- plot_pca(func_profile, what = "UNIREF", var = "Condition", colours = c("red", "blue"), add_ellipse = TRUE)
+#'
+#' @export
 plot_pca <- function(func_profile,what, var, colours, add_ellipse=F) {
 
   # calc PCA
@@ -276,6 +363,24 @@ plot_pca <- function(func_profile,what, var, colours, add_ellipse=F) {
   return(pca_plot)
 }
 
+#' Plot PCoA (Principal Coordinates Analysis) or NMDS (Non-metric Multidimensional Scaling)
+#'
+#' This function performs and plots PCoA or NMDS from a functional profile with metadata. It supports adding ellipses and specifying plot dimensions.
+#'
+#' @param func_profile A list containing functional profiles and corresponding metadata.
+#' @param what A character string specifying which part of the functional profile to use for PCoA or NMDS.
+#' @param var A character string specifying the grouping variable in the metadata.
+#' @param colours A vector of colors to use for the groups.
+#' @param add_ellipse A logical value indicating whether to add ellipses around the groups. Default is `FALSE`.
+#' @param size A numeric value specifying the size of the points. Default is `3`.
+#' @param plot A character string specifying the type of plot, either `"MDS"` (default) or `"NMDS"`.
+#'
+#' @return A ggplot object representing the PCoA or NMDS plot.
+#'
+#' @examples
+#' # Example usage:
+#' pcoa_plot <- plot_pcoa(func_profile, what = "KO", var = "Treatment", colours = c("red", "green"), add_ellipse = TRUE)
+#'
 plot_pcoa <- function(func_profile, what, var, colours, add_ellipse=F, size=3, plot="MDS"){
 
 
@@ -318,8 +423,25 @@ plot_pcoa <- function(func_profile, what, var, colours, add_ellipse=F, size=3, p
 
 }
 
+#' Plot Volcano Plot for Differential Analysis
+#'
+#' This function generates a volcano plot from a results data frame, showing fold changes and adjusted p-values. It highlights significant features based on specified thresholds.
+#'
+#' @param results_df A list containing the results of a differential analysis, including log2 fold changes and adjusted p-values.
+#' @param pthresh A numeric value specifying the p-value cutoff for significance. Default is `0.05`.
+#' @param FCthresh A numeric value specifying the log2 fold change cutoff for significance. Default is `0.58`.
+#' @param ... Additional arguments passed to the `EnhancedVolcano` function.
+#'
+#' @return A volcano plot highlighting significant features based on fold change and p-value thresholds.
+#'
+#' @examples
+#' # Example usage:
+#' volcano_plot <- plot_volcano(results_df, pthresh = 0.05, FCthresh = 0.58)
+#'
+#' @export
 
 plot_volcano <- function(results_df, pthresh=0.05, FCthresh=0.58, ...) {
+  # this should be modified to plot results from maaslin
   res <- results_df$res
   # replace rownames with highest classified level
   rownames(res) <- as.character(lapply(strsplit(as.character(rownames(res)), split="\\|"),

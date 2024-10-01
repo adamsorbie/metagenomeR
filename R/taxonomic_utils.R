@@ -1,16 +1,36 @@
-#' @param ps phyloseq object
-#' @return Returns the taxonomy table slot as a dataframe
-#' @export
+#' Extract Taxonomy Table from a Phyloseq Object
+#'
+#' This function extracts the taxonomy table from a phyloseq object and converts it into a data frame.
+#'
+#' @param ps A phyloseq object containing the taxonomy data.
+#'
+#' @return A data frame representing the taxonomy table.
 #'
 #' @examples
+#' # Example usage:
 #' data(zeller_2014)
 #' taxa <- taxonomy(zeller_2014)
 #'
+#' @export
 taxonomy <- function (ps) {
   return(as.data.frame(tax_table(ps)))
 }
 
-
+#' Convert Sample Metadata to Data Frame
+#'
+#' This function converts the sample metadata in a phyloseq object into a data frame.
+#' Optionally, it includes row names as a column.
+#'
+#' @param ps A phyloseq object containing the sample metadata.
+#' @param rownames A logical value indicating whether to include row names as a column. Default is `TRUE`.
+#'
+#' @return A data frame containing the sample metadata.
+#'
+#' @examples
+#' # Example usage:
+#' metadata <- meta_to_df(ps, rownames = FALSE)
+#'
+#' @export
 meta_to_df <- function(ps, rownames=T) {
   if (rownames == T){
     return(as(sample_data(ps), "data.frame"))
@@ -21,10 +41,40 @@ meta_to_df <- function(ps, rownames=T) {
 
 }
 
+#' Convert OTU Table to Data Frame
+#'
+#' This function converts the OTU (operational taxonomic unit) table of a phyloseq object into a data frame.
+#'
+#' @param ps A phyloseq object containing the OTU table.
+#'
+#' @return A data frame representing the OTU table.
+#'
+#' @examples
+#' # Example usage:
+#' otu_table <- ps_to_feattab(ps)
+#'
+#' @export
 ps_to_feattab <- function(ps) {
   return(as.data.frame(ps@otu_table))
 }
 
+#' Get Top N Taxa by Mean Abundance
+#'
+#' This function extracts the top N taxa from a phyloseq object based on mean relative abundance.
+#' Optionally, taxa can be aggregated to a specified taxonomic level.
+#'
+#' @param ps A phyloseq object containing the taxa data.
+#' @param n An integer specifying the number of top taxa to return.
+#' @param level A character string specifying the taxonomic level to aggregate taxa. Default is `"species"`.
+#' @param agg A logical value indicating whether to aggregate taxa at the specified level. Default is `FALSE`.
+#'
+#' @return A character vector of the top N taxa by mean abundance.
+#'
+#' @examples
+#' # Example usage:
+#' top_taxa <- get_top_n(ps, n = 10, level = "species", agg = TRUE)
+#'
+#' @export
 get_top_n <- function(ps, n, level = "species", agg=F) {
   if (level != "species" & agg == T) {
     ps <- ps %>% tax_fix %>%
@@ -44,6 +94,25 @@ get_top_n <- function(ps, n, level = "species", agg=F) {
   return(topn)
 }
 
+#' Get Top N Taxa by Mean Abundance per Group
+#'
+#' This function extracts the top N taxa from a phyloseq object based on mean relative abundance for a specific group.
+#' Optionally, taxa can be aggregated to a specified taxonomic level.
+#'
+#' @param ps A phyloseq object containing the taxa data.
+#' @param n An integer specifying the number of top taxa to return.
+#' @param level A character string specifying the taxonomic level to aggregate taxa. Default is `"species"`.
+#' @param var A character string specifying the grouping variable in the phyloseq object.
+#' @param group A character string specifying the group to filter on.
+#' @param agg A logical value indicating whether to aggregate taxa at the specified level. Default is `FALSE`.
+#'
+#' @return A character vector of the top N taxa by mean abundance for the specified group.
+#'
+#' @examples
+#' # Example usage:
+#' top_taxa_group <- get_top_n_group(ps, n = 10, level = "species", var = "Treatment", group = "Control")
+#'
+#' @export
 get_top_n_group <- function(ps, n, level = "species",var,
                             group=NULL, agg=F) {
   if (level != "species" & agg == T) {
@@ -65,64 +134,24 @@ get_top_n_group <- function(ps, n, level = "species",var,
   return(topn)
 }
 
-filter_rownames <- function(df, filt_vector) {
-  # wrapper script around filter to handle rownames
-  df_filt <- df %>%
-    rownames_to_column(var="id") %>%
-    filter(id %in% filt_vector) %>%
-    column_to_rownames(var="id")
-  return(df_filt)
-}
-
-common_cols <- function(list_df, n=length(list_df)) {
-  col_list <- map(list_df,names)
-
-  if (n < length(list_df)){
-    n_cols <- table(unlist(col_list))
-    return(names(n_cols[n_cols >= n]))
-  }
-
-  return(Reduce(intersect,col_list))
-}
 
 
-combine_counts <- function(counts_list, taxa_are_cols=T, prev_thresh=0.3) {
-  if (taxa_are_cols == F){
-    counts_list <- map(counts_list, function(x) t(x) %>% as.data.frame)
-  }
-  # purely presence absence
-  shared_taxa <- common_cols(counts_list, n=round(length(counts_list) * prev_thresh))
-
-  combined_counts <- bind_rows(counts_list) %>%
-    select(all_of(shared_taxa))
-  return(combined_counts)
-}
-
-combine_meta <- function(meta_list, col_list) {
-
-  combined_meta <- bind_rows(meta_list) %>%
-    select(all_of(col_list))
-}
-
-t_df <- function(x) {
-  return(as.data.frame(t(x)))
-}
-
-read_tab_delim_metag <- function(df, comment_char="#") {
-  # read all tab delimited files using these params
-  df_out <-
-    read.table(
-      df,
-      row.names = 1,
-      header = 1,
-      sep = "\t",
-      check.names = F,
-      quote = "",
-      comment.char = comment_char
-    )
-  return(df_out)
-}
-
+#' Load Phyloseq Object from ASV Table, Taxonomy, and Mapping
+#'
+#' This function converts ASV (amplicon sequence variant) table, taxonomy, and sample mapping data into a phyloseq object. It also supports adding a phylogenetic tree.
+#'
+#' @param asvtab A data frame representing the ASV table.
+#' @param taxa A data frame representing the taxonomy data.
+#' @param mapping A data frame representing the sample metadata.
+#' @param tree A character string specifying the file path of the phylogenetic tree (optional).
+#'
+#' @return A phyloseq object containing the ASV table, taxonomy, metadata, and optionally the phylogenetic tree.
+#'
+#' @examples
+#' # Example usage:
+#' phyloseq_obj <- load_phylo(asvtab, taxa, mapping, tree = "tree.nwk")
+#'
+#' @export
 load_phylo <- function(asvtab, taxa, mapping, tree = NULL) {
   # convert to phyloseq and return list
   phylo_asv <- otu_table(asvtab, taxa_are_rows = T)
@@ -140,7 +169,19 @@ load_phylo <- function(asvtab, taxa, mapping, tree = NULL) {
   }
 }
 
-
+#' Map Taxonomic Level to Abbreviation
+#'
+#' This function maps a specified taxonomic level to its corresponding abbreviation.
+#'
+#' @param level A character string representing the taxonomic level (e.g., "Species", "Genus", "Family").
+#'
+#' @return A character string representing the abbreviation of the specified taxonomic level.
+#'
+#' @examples
+#' # Example usage:
+#' level_abbreviation <- return_level("Genus")
+#'
+#' @export
 return_level <- function(level) {
   if (level %in% c("Subspecies", "subspecies", "t")) {
     return("t")
@@ -164,6 +205,24 @@ return_level <- function(level) {
   }
 }
 
+#' Select Taxonomic Rank from Merged Table
+#'
+#' This function extracts the specified taxonomic rank from a merged table that contains taxonomic classifications. It supports different taxonomic formats such as Metaphlan and GTDB.
+#'
+#' @param merged_table A data frame containing the merged count and taxonomic information.
+#' @param level A character string specifying the taxonomic level to extract (e.g., "Genus", "Species").
+#' @param tax_format A character string specifying the format of the taxonomic classification. Options are `"metaphlan"` or `"gtdb"`. Default is `"metaphlan"`.
+#'
+#' @return A list containing two data frames:
+#' - `counts`: The count data filtered to include only the specified taxonomic level.
+#' - `tax_table`: The taxonomy table filtered to include only the specified taxonomic level.
+#'
+#' @examples
+#' # Example usage:
+#' result <- select_rank(merged_table, level = "Genus", tax_format = "metaphlan")
+#' counts <- result$counts
+#' tax_table <- result$tax_table
+#'
 select_rank <- function(merged_table, level, tax_format = "metaphlan") {
   level <- return_level(level)
 
@@ -230,6 +289,24 @@ select_rank <- function(merged_table, level, tax_format = "metaphlan") {
   return(return_list)
 }
 
+#' Import Phyloseq Object from Merged Table and Metadata
+#'
+#' This function reads in a merged taxonomic count table and metadata, selects the specified taxonomic level, and converts the data into a phyloseq object. It supports different taxonomic formats such as Metaphlan and GTDB.
+#'
+#' @param merged_table_path A character string representing the file path of the merged count table.
+#' @param metapath A character string representing the file path of the metadata.
+#' @param level A character string specifying the taxonomic level to extract (e.g., "Genus", "Species").
+#' @param tax_format A character string specifying the format of the taxonomic classification. Options are `"metaphlan"` or `"gtdb"`. Default is `"metaphlan"`.
+#' @param table_comment_char A character string specifying the comment character in the merged table file. Default is `"#"`.
+#' @param meta_comment_char A character string specifying the comment character in the metadata file. Default is `"#"`.
+#'
+#' @return A phyloseq object containing the filtered count data, taxonomic table, and metadata.
+#'
+#' @examples
+#' # Example usage:
+#' phyloseq_obj <- import_pseq_metag("path/to/merged_table.txt", "path/to/metadata.txt", level = "Genus")
+#'
+#' @export
 import_pseq_metag <- function(merged_table_path, metapath, level,
                               tax_format="metaphlan", table_comment_char="#",
                               meta_comment_char="#") {

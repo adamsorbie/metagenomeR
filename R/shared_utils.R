@@ -29,7 +29,7 @@ t_df <- function(x) {
 #' metag_data <- read_tab_delim_metag("data/tab_delimited_file.txt")
 #'
 #' @export
-read_tab_delim_metag <- function(df) {
+read_tab_delim_metag <- function(df, comment_char) {
   # read all tab delimited files using these params
   df_out <-
     data.frame(fread(df, header = T,

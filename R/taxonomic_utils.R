@@ -308,12 +308,11 @@ select_rank <- function(merged_table, level, tax_format = "metaphlan") {
 #'
 #' @export
 import_pseq_metag <- function(merged_table_path, metapath, level,
-                              tax_format="metaphlan", table_comment_char="#",
-                              meta_comment_char="#") {
+                              tax_format="metaphlan") {
   # read files
 
-  merged_table <- read_tab_delim_metag(merged_table_path, comment_char = table_comment_char)
-  metadata <- read_tab_delim_metag(metapath, comment_char = meta_comment_char)
+  merged_table <- read_tab_delim_metag(merged_table_path)
+  metadata <- read_tab_delim_metag(metapath)
 
   merged_table_rank <- select_rank(merged_table, level=level, tax_format=tax_format)
 

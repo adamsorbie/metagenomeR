@@ -32,9 +32,16 @@ t_df <- function(x) {
 read_tab_delim_metag <- function(df, comment_char) {
   # read all tab delimited files using these params
   df_out <-
-    data.frame(fread(df, header = T,
-                     check.names = F, quote = ""),
-               row.names = 1, check.names = F)
+    data.frame(
+      fread(
+        df,
+        header = T,
+        check.names = F,
+        quote = ""
+      ),
+      row.names = 1,
+      check.names = F
+    )
 
   return(df_out)
 }
@@ -56,8 +63,8 @@ read_tab_delim_metag <- function(df, comment_char) {
 filter_rownames <- function(df, filt_vector) {
   # wrapper script around filter to handle rownames
   df_filt <- df %>%
-    rownames_to_column(var="id") %>%
+    rownames_to_column(var = "id") %>%
     filter(id %in% filt_vector) %>%
-    column_to_rownames(var="id")
+    column_to_rownames(var = "id")
   return(df_filt)
 }

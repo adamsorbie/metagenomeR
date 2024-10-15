@@ -19,16 +19,20 @@
 #' maaslin2_tax(tax_profile, out = "maaslin2_output", fixed = c("age", "sex"))
 #'
 #' @export
-maaslin2_tax <- function(tax_profile, out,
-                         fixed, abun_thresh=0, prev_thresh=0, taxonomy="metaphlan",...){
-
+maaslin2_tax <- function(tax_profile,
+                         out,
+                         fixed,
+                         abun_thresh = 0,
+                         prev_thresh = 0,
+                         taxonomy = "metaphlan",
+                         ...) {
   mat_in <- ps_to_feattab(tax_profile) %>%
     t_df()
   # this only works for species level
-  if (taxonomy == "metaphlan"){
-    colnames(mat_in) <- sapply(strsplit(colnames(mat_in), split= "\\|", fixed = TRUE), tail, 1L)
-  } else if (taxonomy == "gtdb"){
-    colnames(mat_in) <- sapply(strsplit(colnames(mat_in), split= ";", fixed = TRUE), tail, 1L)
+  if (taxonomy == "metaphlan") {
+    colnames(mat_in) <- sapply(strsplit(colnames(mat_in), split = "\\|", fixed = TRUE), tail, 1L)
+  } else if (taxonomy == "gtdb") {
+    colnames(mat_in) <- sapply(strsplit(colnames(mat_in), split = ";", fixed = TRUE), tail, 1L)
   } else {
     stop("unsupported taxonomy")
   }
@@ -36,16 +40,17 @@ maaslin2_tax <- function(tax_profile, out,
 
   metadata_in <- meta_to_df(tax_profile)
 
-  Maaslin2(input_data = mat_in,
-           input_metadata = metadata_in,
-           output = out,
-           normalization = "NONE",
-           transform = "NONE",
-           min_abundance = abun_thresh,
-           min_prevalence = prev_thresh,
-           fixed_effects = fixed,
-           cores=6,
-           ...
+  Maaslin2(
+    input_data = mat_in,
+    input_metadata = metadata_in,
+    output = out,
+    normalization = "NONE",
+    transform = "NONE",
+    min_abundance = abun_thresh,
+    min_prevalence = prev_thresh,
+    fixed_effects = fixed,
+    cores = 6,
+    ...
   )
 }
 
@@ -70,27 +75,32 @@ maaslin2_tax <- function(tax_profile, out,
 #' maaslin2_func(func_profiles, feattype = "UNIREF", out = "maaslin2_output", fixed = c("age", "sex"))
 #'
 #' @export
-maaslin2_func <- function(func_profiles, feattype, out,
-                          fixed, abun_thresh=0, prev_thresh=0, cores=6, ...){
+maaslin2_func <- function(func_profiles,
+                          feattype,
+                          out,
+                          fixed,
+                          abun_thresh = 0,
+                          prev_thresh = 0,
+                          cores = 6,
+                          ...) {
   # write check for filtering and AST transform
-  if (feattype %in% c("UNIREF", "EC", "KO", "pathways")){
+  if (feattype %in% c("UNIREF", "EC", "KO", "pathways")) {
     mat_in <- func_profiles[[feattype]]
     metadata_in <- func_profiles$Metadata
   } else {
     stop("Feature type not supported, choose from: 'UNIREF', 'EC', 'KO', 'pathways'")
   }
 
-  Maaslin2(input_data = mat_in,
-           input_metadata = metadata_in,
-           output = out,
-           normalization = "NONE",
-           transform = "NONE",
-           min_abundance = abun_thresh,
-           min_prevalence = prev_thresh,
-           fixed_effects = fixed,
-           cores=cores,
-           ...
+  Maaslin2(
+    input_data = mat_in,
+    input_metadata = metadata_in,
+    output = out,
+    normalization = "NONE",
+    transform = "NONE",
+    min_abundance = abun_thresh,
+    min_prevalence = prev_thresh,
+    fixed_effects = fixed,
+    cores = cores,
+    ...
   )
 }
-
-

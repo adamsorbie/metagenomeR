@@ -63,18 +63,21 @@ check_equal_sample_sizes <- function(df, variable_col) {
 #' stat_results <- stat_plot(df, formula = y ~ x, variable_col = "group")
 #'
 #' @export
-stat_plot <- function(df, formula, variable_col, assume_normality=F, multiple_groups=F, paired=F) {
-
+stat_plot <- function(df,
+                      formula,
+                      variable_col,
+                      assume_normality = F,
+                      multiple_groups = F,
+                      paired = F) {
   # Check paired
-  if (paired == TRUE){
-    if (check_equal_sample_sizes(df, variable_col) == F){
+  if (paired == TRUE) {
+    if (check_equal_sample_sizes(df, variable_col) == F) {
       stop("Sample sizes are not equal for paired statistical test")
     }
   }
 
   if (multiple_groups == TRUE) {
     if (paired == TRUE) {
-
       stat_variance <- df %>%
         friedman_test(formula)
       stat_test <- df %>%
@@ -157,7 +160,7 @@ plot_boxplot <- function(df,
                          cols = NULL,
                          group.order = NULL,
                          paired = FALSE,
-                         normal=FALSE,
+                         normal = FALSE,
                          ...) {
   # extend color palette with transparent value - required due to way we are
   # layering plot
@@ -335,11 +338,14 @@ plot_scatter <- function(df,
 #' pca_plot <- plot_pca(func_profile, what = "UNIREF", var = "Condition", colours = c("red", "blue"), add_ellipse = TRUE)
 #'
 #' @export
-plot_pca <- function(func_profile,what, var, colours, add_ellipse=F) {
-
+plot_pca <- function(func_profile,
+                     what,
+                     var,
+                     colours,
+                     add_ellipse = F) {
   # calc PCA
   metadata_filt <- func_profile[["Metadata"]] %>% select(all_of(var))
-  dat <- merge(func_profile[[what]], metadata_filt, by=0) %>%
+  dat <- merge(func_profile[[what]], metadata_filt, by = 0) %>%
     column_to_rownames("Row.names")
   # this will select numerical metadata
   pca <- prcomp(dat %>% select(where(is.numeric)), scale. = T)
@@ -347,17 +353,16 @@ plot_pca <- function(func_profile,what, var, colours, add_ellipse=F) {
 
   # Plot
   scree_plot <- fviz_eig(pca)
-  pca_plot <- autoplot(pca, data = dat,
-                       colour = var) +
-    geom_point(aes(color= .data[[ var ]] ), size=3, alpha=0.75) +
+  pca_plot <- autoplot(pca, data = dat, colour = var) +
+    geom_point(aes(color = .data[[var]]), size = 3, alpha = 0.75) +
     scale_color_manual(values = colours) +
     scale_fill_manual(values = colours) +
     theme_cowplot()
   pca_plot$layers[[1]] <- NULL
 
-  if (add_ellipse == TRUE){
+  if (add_ellipse == TRUE) {
     pca_plot <- pca_plot +
-      geom_polygon(stat = "ellipse", aes(fill = .data [[ var ]] ), alpha = 0.3)
+      geom_polygon(stat = "ellipse", aes(fill = .data [[var]]), alpha = 0.3)
   }
 
   return(pca_plot)
@@ -381,10 +386,14 @@ plot_pca <- function(func_profile,what, var, colours, add_ellipse=F) {
 #' # Example usage:
 #' pcoa_plot <- plot_pcoa(func_profile, what = "KO", var = "Treatment", colours = c("red", "green"), add_ellipse = TRUE)
 #'
-plot_pcoa <- function(func_profile, what, var, colours, add_ellipse=F, size=3, plot="MDS"){
-
-
-  if (plot == "MDS"){
+plot_pcoa <- function(func_profile,
+                      what,
+                      var,
+                      colours,
+                      add_ellipse = F,
+                      size = 3,
+                      plot = "MDS") {
+  if (plot == "MDS") {
     dist <- calc_dist(func_profile, feat_type = what)
     mds <- cmdscale(dist, eig = T)
     x_label <- "PCo1"
@@ -392,9 +401,14 @@ plot_pcoa <- function(func_profile, what, var, colours, add_ellipse=F, size=3, p
     colnames(mds$points) <- c(x_label, y_label)
 
 
-  } else if (plot == "NMDS"){
+  } else if (plot == "NMDS") {
     # NMDS
-    mds <- metaMDS(comm = func_profile[[what]], distance = "bray", trace = FALSE, autotransform = FALSE)
+    mds <- metaMDS(
+      comm = func_profile[[what]],
+      distance = "bray",
+      trace = FALSE,
+      autotransform = FALSE
+    )
     x_label <- "NMDS1"
     y_label <- "NMDS2"
     colnames(mds$points) <- c("PCo1", "PCo2")
@@ -402,21 +416,21 @@ plot_pcoa <- function(func_profile, what, var, colours, add_ellipse=F, size=3, p
 
 
   mds_dat <- mds$points %>%
-    merge(func_profile[["Metadata"]], by=0)
-  expvar <- (eigenvals(mds)/sum(eigenvals(mds)))[1:2]
+    merge(func_profile[["Metadata"]], by = 0)
+  expvar <- (eigenvals(mds) / sum(eigenvals(mds)))[1:2]
 
-  mds_plot <- ggplot(mds_dat, aes(PCo1, PCo2, color = .data[[ var ]])) +
-    geom_point(size=size, alpha=0.75) +
+  mds_plot <- ggplot(mds_dat, aes(PCo1, PCo2, color = .data[[var]])) +
+    geom_point(size = size, alpha = 0.75) +
     scale_color_manual(values = colours) +
     scale_fill_manual(values = colours) +
     theme_cowplot() +
-    xlab(paste(x_label, round(expvar[1]*100, digits = 1), "%")) +
-    ylab(paste(y_label, round(expvar[2]*100, digits = 1), "%" ))
+    xlab(paste(x_label, round(expvar[1] * 100, digits = 1), "%")) +
+    ylab(paste(y_label, round(expvar[2] * 100, digits = 1), "%"))
 
 
-  if (add_ellipse == TRUE){
+  if (add_ellipse == TRUE) {
     mds_plot <- mds_plot +
-      geom_polygon(stat = "ellipse", aes(fill = .data [[ var ]] ), alpha = 0.3)
+      geom_polygon(stat = "ellipse", aes(fill = .data [[var]]), alpha = 0.3)
   }
 
   return(mds_plot)
@@ -440,23 +454,28 @@ plot_pcoa <- function(func_profile, what, var, colours, add_ellipse=F, size=3, p
 #'
 #' @export
 
-plot_volcano <- function(results_df, pthresh=0.05, FCthresh=0.58, ...) {
+plot_volcano <- function(results_df,
+                         pthresh = 0.05,
+                         FCthresh = 0.58,
+                         ...) {
   # this should be modified to plot results from maaslin
   res <- results_df$res
   # replace rownames with highest classified level
-  rownames(res) <- as.character(lapply(strsplit(as.character(rownames(res)), split="\\|"),
-                                       tail, n=1))
+  rownames(res) <- as.character(lapply(strsplit(as.character(rownames(
+    res
+  )), split = "\\|"), tail, n = 1))
   groups <- results_df$groups
-  EnhancedVolcano(res, x="log2FC", y="p.adj",
-                  lab=rownames(res),
-                  labSize = 4,
-                  pCutoff = pthresh,
-                  FCcutoff = FCthresh,
-                  title = paste(groups[1],
-                                "versus",
-                                groups[2],
-                                sep=" "),
-                  subtitle = NULL,
-                  max.overlaps = 30,
-                  ...)
+  EnhancedVolcano(
+    res,
+    x = "log2FC",
+    y = "p.adj",
+    lab = rownames(res),
+    labSize = 4,
+    pCutoff = pthresh,
+    FCcutoff = FCthresh,
+    title = paste(groups[1], "versus", groups[2], sep = " "),
+    subtitle = NULL,
+    max.overlaps = 30,
+    ...
+  )
 }

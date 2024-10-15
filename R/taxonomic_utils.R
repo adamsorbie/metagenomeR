@@ -31,8 +31,8 @@ taxonomy <- function (ps) {
 #' metadata <- meta_to_df(ps, rownames = FALSE)
 #'
 #' @export
-meta_to_df <- function(ps, rownames=T) {
-  if (rownames == T){
+meta_to_df <- function(ps, rownames = T) {
+  if (rownames == T) {
     return(as(sample_data(ps), "data.frame"))
   } else {
     return(as(sample_data(ps), "data.frame") %>%
@@ -75,7 +75,7 @@ ps_to_feattab <- function(ps) {
 #' top_taxa <- get_top_n(ps, n = 10, level = "species", agg = TRUE)
 #'
 #' @export
-get_top_n <- function(ps, n, level = "species", agg=F) {
+get_top_n <- function(ps, n, level = "species", agg = F) {
   if (level != "species" & agg == T) {
     ps <- ps %>% tax_fix %>%
       tax_agg(rank = level)
@@ -113,8 +113,12 @@ get_top_n <- function(ps, n, level = "species", agg=F) {
 #' top_taxa_group <- get_top_n_group(ps, n = 10, level = "species", var = "Treatment", group = "Control")
 #'
 #' @export
-get_top_n_group <- function(ps, n, level = "species",var,
-                            group=NULL, agg=F) {
+get_top_n_group <- function(ps,
+                            n,
+                            level = "species",
+                            var,
+                            group = NULL,
+                            agg = F) {
   if (level != "species" & agg == T) {
     ps <- ps %>% tax_fix %>%
       tax_agg(rank = level)
@@ -197,8 +201,7 @@ return_level <- function(level) {
     return("c")
   } else if (level %in% c("Phylum", "phylum", "p")) {
     return("p")
-  } else if (level %in% c("Kingdom", "kingdom", "k",
-                          "Domain", "domain", "d")) {
+  } else if (level %in% c("Kingdom", "kingdom", "k", "Domain", "domain", "d")) {
     return("k")
   } else {
     stop("Not a valid taxonomic rank")
@@ -307,16 +310,21 @@ select_rank <- function(merged_table, level, tax_format = "metaphlan") {
 #' phyloseq_obj <- import_pseq_metag("path/to/merged_table.txt", "path/to/metadata.txt", level = "Genus")
 #'
 #' @export
-import_pseq_metag <- function(merged_table_path, metapath, level,
-                              tax_format="metaphlan") {
+import_pseq_metag <- function(merged_table_path,
+                              metapath,
+                              level,
+                              tax_format = "metaphlan") {
   # read files
 
   merged_table <- read_tab_delim_metag(merged_table_path)
   metadata <- read_tab_delim_metag(metapath)
 
-  merged_table_rank <- select_rank(merged_table, level=level, tax_format=tax_format)
+  merged_table_rank <- select_rank(merged_table, level = level, tax_format =
+                                     tax_format)
 
-  out <- load_phylo(merged_table_rank$counts, merged_table_rank$tax_table, metadata)
+  out <- load_phylo(merged_table_rank$counts,
+                    merged_table_rank$tax_table,
+                    metadata)
 
   return(out)
 }

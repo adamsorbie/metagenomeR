@@ -27,11 +27,16 @@
 #' func_profile <- import_func_profile(meta, un, ec, ko, py, read = TRUE)
 #'
 #' @export
-import_func_profile <- function(meta, un, ec, ko, py, filter_ungrouped=T, renorm=T,
-                                read=F, fix_names=T){
-
-  if (read == TRUE){
-
+import_func_profile <- function(meta,
+                                un,
+                                ec,
+                                ko,
+                                py,
+                                filter_ungrouped = T,
+                                renorm = T,
+                                read = F,
+                                fix_names = T) {
+  if (read == TRUE) {
     un <- read_tab_delim_metag(un)
     ec <- read_tab_delim_metag(ec)
     ko <- read_tab_delim_metag(ko)
@@ -42,8 +47,10 @@ import_func_profile <- function(meta, un, ec, ko, py, filter_ungrouped=T, renorm
   feat <- list(un, ec, ko, py)
   names(feat) <- c("UNIREF", "EC", "KO", "pathways")
 
-  if (fix_names == T){
-    colnames(feat$UNIREF) <- gsub("_merged_clean_Abundance-RPKs", "", colnames(feat$UNIREF))
+  if (fix_names == T) {
+    colnames(feat$UNIREF) <- gsub("_merged_clean_Abundance-RPKs",
+                                  "",
+                                  colnames(feat$UNIREF))
     colnames(feat$EC) <- gsub("_merged_clean_Abundance-RPKs", "", colnames(feat$EC))
     colnames(feat$KO) <- gsub("_merged_clean_Abundance-RPKs", "", colnames(feat$KO))
     colnames(feat$pathways) <- gsub("_merged_clean_Abundance", "", colnames(feat$pathways))
@@ -52,32 +59,39 @@ import_func_profile <- function(meta, un, ec, ko, py, filter_ungrouped=T, renorm
 
   sample_names <- meta %>% rownames()
 
-  feat <- map(feat, function(x) x %>%
-                select(all_of(sample_names)) )
+  feat <- map(feat, function(x)
+    x %>%
+      select(all_of(sample_names)))
 
-  if (filter_ungrouped == TRUE){
-    feat <- map(feat, function(x) x %>%
-                  rownames_to_column("tmp") %>%
-                  filter(! tmp %in% c("UNGROUPED", "UNMAPPED", "UNINTEGRATED")) %>%
-                  column_to_rownames("tmp"))
-    if (renorm == T){
-      feat <- map(feat, function(x) t_df(100 * t_df(x) / colSums(x)))
+  if (filter_ungrouped == TRUE) {
+    feat <- map(feat, function(x)
+      x %>%
+        rownames_to_column("tmp") %>%
+        filter(!tmp %in% c(
+          "UNGROUPED", "UNMAPPED", "UNINTEGRATED"
+        )) %>%
+        column_to_rownames("tmp"))
+    if (renorm == T) {
+      feat <- map(feat, function(x)
+        t_df(100 * t_df(x) / colSums(x)))
     }
   }
   # annotate
-  feat <- map(c("UNIREF", "EC","KO", "pathways"), function(x) annotate_func(func_profile = feat,
-                                                                            feat_type = x))
+  feat <- map(c("UNIREF", "EC", "KO", "pathways"), function(x)
+    annotate_func(func_profile = feat, feat_type = x))
 
   names(feat) <- c("UNIREF", "EC", "KO", "pathways")
 
   # add EC prefix
   colnames(feat[["EC"]]) <- paste0("EC:", colnames(feat[["EC"]]))
 
-  return_list <- list("UNIREF" = feat[["UNIREF"]],
-                      "EC" = feat[["EC"]],
-                      "KO" = feat[["KO"]],
-                      "pathways" = feat[["pathways"]],
-                      "Metadata" = meta)
+  return_list <- list(
+    "UNIREF" = feat[["UNIREF"]],
+    "EC" = feat[["EC"]],
+    "KO" = feat[["KO"]],
+    "pathways" = feat[["pathways"]],
+    "Metadata" = meta
+  )
 
   return(return_list)
 
@@ -142,26 +156,19 @@ get_db_paths <- function(db) {
 #' annotated_profile <- annotate_func(func_profile, feat_type = "KO")
 #'
 #' @export
-annotate_func <- function(func_profile, feat_type=NULL) {
-
-
-
-  if (feat_type %in% c("UNIREF", "EC", "KO", "pathways")){
-
-    if (feat_type == "KO"){
-      mapfile <- read_tsv(get_db_paths("KO"),
-                          col_names = c("feat", "name"))
-    } else if (feat_type == "EC"){
-      mapfile <- read_tsv(get_db_paths("EC"),
-                          col_names = c("feat", "name"))
+annotate_func <- function(func_profile, feat_type = NULL) {
+  if (feat_type %in% c("UNIREF", "EC", "KO", "pathways")) {
+    if (feat_type == "KO") {
+      mapfile <- read_tsv(get_db_paths("KO"), col_names = c("feat", "name"))
+    } else if (feat_type == "EC") {
+      mapfile <- read_tsv(get_db_paths("EC"), col_names = c("feat", "name"))
     } else {
-      mapfile <- read_tsv(get_db_paths("pathways"),
-                          col_names = c("feat", "name"))
+      mapfile <- read_tsv(get_db_paths("pathways"), col_names = c("feat", "name"))
     }
 
   }
 
-  if (feat_type == "UNIREF"){
+  if (feat_type == "UNIREF") {
     return(func_profile[["UNIREF"]] %>% t_df())
   } else {
     lookup <- mapfile$feat
@@ -169,16 +176,15 @@ annotate_func <- function(func_profile, feat_type=NULL) {
 
     feat <- func_profile[[feat_type]]
 
-    feat$name <- lapply(rownames(feat), function(x) names(lookup)[match(x, lookup)])
+    feat$name <- lapply(rownames(feat), function(x)
+      names(lookup)[match(x, lookup)])
 
     feat <- feat %>% rownames_to_column("id") %>%
       unite(feat_type, all_of(c("id", "name")), sep = "_", remove = T) %>%
-      column_to_rownames(var="feat_type") %>%
+      column_to_rownames(var = "feat_type") %>%
       t_df()
 
     func_profile[feat_type] <- feat
   }
 
 }
-
-

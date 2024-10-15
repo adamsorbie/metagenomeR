@@ -1,4 +1,6 @@
-transform <- function(ps, transform = "relative", offset=1) {
+transform <- function(ps,
+                      transform = "relative",
+                      offset = 1) {
   if (length(is(ps)) == 1 && class(ps) == "phyloseq") {
     x <- ps_to_feattab(ps)
     mean_sum <- mean(colSums(x))
@@ -21,7 +23,7 @@ transform <- function(ps, transform = "relative", offset=1) {
       } else {
         stop("not proportion data, exiting")
       }
-    } else if (transform == "log10"){
+    } else if (transform == "log10") {
       if (max_x == 100 | max_x == 1) {
         warning("data are relative abundances", call. = F)
         ps_t <- log10(x + offset)
@@ -40,8 +42,7 @@ transform <- function(ps, transform = "relative", offset=1) {
 
 }
 
-filter_ps <- function(ps, abun, prev=NULL) {
-
+filter_ps <- function(ps, abun, prev = NULL) {
   x <- ps_to_feattab(ps) %>%
     as.matrix()
 
@@ -58,12 +59,12 @@ filter_ps <- function(ps, abun, prev=NULL) {
 }
 
 subset_samples_func <- function(func_profile, filter_statement) {
-
   keep <- func_profile$Metadata %>%
     filter(eval(rlang::parse_expr(filter_statement))) %>%
     rownames()
 
-  func_profile_filt <- map(func_profile, function(x) filter_rownames(x, keep))
+  func_profile_filt <- map(func_profile, function(x)
+    filter_rownames(x, keep))
 
   return(func_profile_filt)
 
@@ -71,8 +72,8 @@ subset_samples_func <- function(func_profile, filter_statement) {
 
 
 prune_samples_func  <- function(func_profile, keep) {
-
-  func_profile_filt <- map(func_profile, function(x) filter_rownames(x, keep))
+  func_profile_filt <- map(func_profile, function(x)
+    filter_rownames(x, keep))
   return(func_profile_filt)
 
 }
@@ -90,27 +91,33 @@ asin_sqrt <- function(x) {
   }
 }
 
-transform_func <- function(func_profile, transform, features_are_rows=TRUE, offset=1e-6) {
-
-  if ("Metadata" %in% names(func_profile)){
+transform_func <- function(func_profile,
+                           transform,
+                           features_are_rows = TRUE,
+                           offset = 1e-6) {
+  if ("Metadata" %in% names(func_profile)) {
     feat_tables <- get_feat_tables(func_profile)
   } else {
     feat_tables <- func_profile
   }
 
-  if (features_are_rows == FALSE){
-    feat_tables <- map(feat_tables, function(x) t_df(x))
+  if (features_are_rows == FALSE) {
+    feat_tables <- map(feat_tables, function(x)
+      t_df(x))
   }
   if (transform %in% c("relative", "arcsin", "log10")) {
     if (transform == "relative") {
-      feat_tables <- map(feat_tables, function(x) t_df(100 * t_df(x) / colSums(x)))
+      feat_tables <- map(feat_tables, function(x)
+        t_df(100 * t_df(x) / colSums(x)))
       feat_tables$Metadata <- func_profile$Metadata
     }
     else if (transform == "arcsin") {
-      feat_tables <- map(feat_tables, function(x) asin_sqrt(x))
+      feat_tables <- map(feat_tables, function(x)
+        asin_sqrt(x))
       feat_tables$Metadata <- func_profile$Metadata
-    } else if (transform == "log10"){
-      feat_tables <- map(feat_tables, function(x) log10(x + offset))
+    } else if (transform == "log10") {
+      feat_tables <- map(feat_tables, function(x)
+        log10(x + offset))
       feat_tables$Metadata <- func_profile$Metadata
     }
   } else {
@@ -119,18 +126,19 @@ transform_func <- function(func_profile, transform, features_are_rows=TRUE, offs
 
 
 
-  if (features_are_rows == TRUE){
+  if (features_are_rows == TRUE) {
     return(feat_tables)
   } else {
-    feat_tables <- map(feat_tables, function(x) t_df(x))
+    feat_tables <- map(feat_tables, function(x)
+      t_df(x))
     feat_tables$Metadata <- func_profile$Metadata
     return(feat_tables)
   }
 }
 
-filt_prev_abund  <- function(x, abund, prev, orientation="cols") {
-  if (orientation %in% c("cols", "columns", "c", "r", "rows")){
-    if (orientation %in% c("cols", "columns", "c")){
+filt_prev_abund  <- function(x, abund, prev, orientation = "cols") {
+  if (orientation %in% c("cols", "columns", "c", "r", "rows")) {
+    if (orientation %in% c("cols", "columns", "c")) {
       filt <- x[which(rowSums(x > abund)
                       >= prev * ncol(x)), ]
       return(filt)
@@ -145,14 +153,14 @@ filt_prev_abund  <- function(x, abund, prev, orientation="cols") {
   return(filt)
 }
 
-filter_func <- function(func_profile, abund, prev, renorm=T) {
-
+filter_func <- function(func_profile, abund, prev, renorm = T) {
   feat_tables <- get_feat_tables(func_profile)
-  func_profile_filt <- map(feat_tables, function(x) filt_prev_abund(x, abund, prev, orientation="rows"))
+  func_profile_filt <- map(feat_tables, function(x)
+    filt_prev_abund(x, abund, prev, orientation = "rows"))
 
   func_profile_filt$Metadata <- func_profile$Metadata
 
-  if (renorm == T){
+  if (renorm == T) {
     func_profile_filt <- transform_func(func_profile_filt, "relative", features_are_rows = F)
   }
   return(func_profile_filt)

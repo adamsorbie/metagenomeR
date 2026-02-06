@@ -1,11 +1,3 @@
-#' Read Tab-Delimited Metagenomics File
-#'
-#' This function reads a tab-delimited file into a data frame using specific parameters, such as no quotes and not checking column names.
-#'
-#' @param df A character string representing the file path of the tab-delimited file.
-#'
-
-
 #' Import Functional Profile
 #'
 #' This function imports functional profiles (such as UniRef, EC, KO, and pathways), processes them, and applies optional filtering and renormalization.

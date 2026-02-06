@@ -328,3 +328,43 @@ import_pseq_metag <- function(merged_table_path,
 
   return(out)
 }
+
+get_top_n <- function(ps, n, level = "species", agg=F) {
+  if (level != "species" & agg == T) {
+    ps <- ps %>% tax_fix %>%
+      tax_agg(rank = level)
+    ps <- ps_get(ps)
+  }
+
+  topn <- ps %>%
+    transform(transform = "relative") %>%
+    psmelt() %>%
+    group_by(OTU) %>%
+    summarise(Mean_abund = mean(Abundance)) %>%
+    # remove those with zero abundance
+    filter(Mean_abund > 0) %>%
+    slice_max(Mean_abund, n = n) %>%
+    pull(OTU)
+  return(topn)
+}
+
+get_top_n_group <- function(ps, n, level = "species",var,
+                            group=NULL, agg=F) {
+  if (level != "species" & agg == T) {
+    ps <- ps %>% tax_fix %>%
+      tax_agg(rank = level)
+    ps <- ps_get(ps)
+  }
+  topn <- ps %>%
+    transform(transform = "relative") %>%
+    psmelt() %>%
+    filter({{ var }} == {{ group }}) %>%
+    group_by(OTU) %>%
+    summarise(Mean_abund = mean(Abundance)) %>%
+    # remove those with zero abundance
+    filter(Mean_abund > 0) %>%
+    slice_max(Mean_abund, n = n) %>%
+    pull(OTU)
+
+  return(topn)
+}

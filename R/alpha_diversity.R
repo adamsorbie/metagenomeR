@@ -24,11 +24,11 @@ richness <- function(x, detection = 1e-5) {
 #' @return Returns specified alpha-diversity metrics as a dataframe
 #'
 #' @examples
-#'
 #' data(zeller_2014)
-#' alpha_div <- alpha_div(zeller_2014)
-#' Only richness
-#' alpha_div <- alpha_div(zeller_2014, indices=c("Richness"))
+#' alpha_div <- calc_alpha(zeller_2014)
+#' # Only richness
+#' alpha_div <- calc_alpha(zeller_2014, indices = c("Richness"))
+#'
 #' @export
 calc_alpha <- function(ps,
                        indices = c("Richness", "Shannon.Effective", "Shannon", "Inverse.Simpson")) {

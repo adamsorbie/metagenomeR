@@ -479,3 +479,78 @@ plot_volcano <- function(results_df,
     ...
   )
 }
+
+plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
+                                 per_group=F, groups=NULL, agg=F) {
+  ranks <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+  if (!tax_level %in% ranks){
+    stop("Provide a valid taxonomic rank")
+  }
+  var <- enquo(var)
+
+  if (per_group == T){
+    top_tax <- map(groups, function(x) ps %>%
+                     get_top_n_group(n = n_taxa, level = tax_level,var= !!var,
+                                     group =x, agg=agg))
+    top_tax <- c(unique(unlist(top_tax)), "other")
+    # redefine n_taxa as in this case it reflects n across groups
+    n_taxa <- length(top_tax)
+  } else {
+    top_tax <- c(get_top_n(ps, n=n_taxa, level = tax_level), "other")
+  }
+
+  if (!is.null(ord)) {
+    ps <- ps %>%
+      ps_mutate(plot_var = factor(.data[[var]], levels = ord))
+  }
+
+  if (agg == T){
+    melt_ps <- ps %>%
+      aggregate_taxa(level = tax_level) %>%
+      psmelt()
+  } else {
+    melt_ps <- ps %>%
+      psmelt()
+  }
+
+  taxa_plot <- melt_ps %>% filter(OTU %in% top_tax)
+
+  # group rest into other
+  repl_cols <- c("OTU", ranks)
+
+  other_plot <- melt_ps %>% filter(!OTU %in% top_tax) %>%
+    group_by(Sample) %>%
+    mutate(Abundance = sum(Abundance)) %>%
+    ungroup %>%
+    distinct(Sample, .keep_all = T) %>%
+    mutate_at(vars(repl_cols), ~ paste("other"))
+
+  # bind dfs
+  plot_df <- bind_rows(taxa_plot, other_plot)
+
+  taxa_pal <- c(stacked_bar.palette[1:length(top_tax)-1], "#DCDCDC", "white")
+  names(taxa_pal) <- plot_df %>% filter(OTU %in% top_tax) %>%
+    pull(.data[[ tax_level ]]) %>%
+    unique()
+
+  comp_fig <- plot_df %>%
+    ggplot(aes(fill=.data[[ tax_level ]], y=Abundance, x=Sample)) +
+    geom_bar(position="fill", stat="identity") +
+    scale_fill_manual(values = taxa_pal) +
+    facet_grid(. ~ factor(plot_var),
+               scales = "free", space = "free") +
+    theme_cowplot() +
+    scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+    theme(
+      panel.background = ggplot2::element_blank(),
+      panel.grid = ggplot2::element_blank(),
+      axis.text.x = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_text(size = 22),
+      axis.text.y = element_text(size = 18),
+      axis.ticks = element_blank()
+    )
+  #return_list <- list("Figure" = comp_fig, "Other" = other_plot)
+
+  return(comp_fig)
+}

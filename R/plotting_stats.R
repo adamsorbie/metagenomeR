@@ -149,6 +149,7 @@ stat_plot <- function(df,
 #' # Example usage:
 #' plot <- plot_boxplot(df, "group", "value", comparisons_list = list(c("A", "B")))
 #'
+#' @importFrom ggpubr rotate_x_text stat_pvalue_manual
 #' @export
 plot_boxplot <- function(df,
                          variable_col,
@@ -285,6 +286,7 @@ plot_boxplot <- function(df,
 #' # Example usage:
 #' plot <- plot_scatter(df, x = "height", y = "weight", point_color = "blue", line_color = "red", fill_color = "lightblue", xlab = "Height", ylab = "Weight", corr.method = "pearson")
 #'
+#' @importFrom ggpubr stat_cor
 #' @export
 plot_scatter <- function(df,
                          x,
@@ -468,6 +470,7 @@ plot_pcoa <- function(func_profile,
 plot_beta_div <- function(ps,
                           dist_matrix,
                           beta_div,
+                          group_variable,
                           add_ellipse = FALSE,
                           cols = NULL,
                           shape = NULL) {
@@ -657,7 +660,78 @@ plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
       axis.text.y = element_text(size = 18),
       axis.ticks = element_blank()
     )
-  #return_list <- list("Figure" = comp_fig, "Other" = other_plot)
 
   return(comp_fig)
 }
+
+#' Plot Differential Abundance Results
+#'
+#' This function creates a dot plot visualizing differentially abundant taxa from
+#' MaAsLin2 results. Points are colored by the group in which each taxon is enriched,
+#' with the coefficient value indicating the direction and magnitude of the effect.
+#'
+#' @param maaslin_res A data frame containing MaAsLin2 results, typically from
+#'   `Maaslin2::Maaslin2()`. Must contain columns `feature`, `coef`, and `qval`.
+#' @param groups A character vector of length 2 specifying the group names being
+#'   compared. The first element is the reference group (negative coefficients),
+#'   and the second is the comparison group (positive coefficients).
+#' @param cols A vector of colors for the two groups. Default is `NULL`, which
+#'   uses the NPG color palette from ggsci.
+#' @param pthresh A numeric value specifying the q-value (FDR-adjusted p-value)
+#'   threshold for significance. Default is `0.25` (MaAsLin2 default).
+#'
+#' @return A ggplot object showing differentially abundant species as a horizontal
+#'   dot plot, with coefficient values on the x-axis and species names on the y-axis.
+#'   Points are colored by enrichment direction.
+#'
+#' @examples
+#' # Example usage with MaAsLin2 results:
+#' # da_plot <- plot_da(maaslin_results, groups = c("Control", "Treatment"))
+#' # da_plot <- plot_da(maaslin_results, groups = c("Healthy", "Disease"),
+#' #                    cols = c("blue", "red"), pthresh = 0.1)
+#'
+#' @importFrom ggsci pal_npg
+#' @importFrom stringr str_extract
+#' @export
+plot_da <- function(maaslin_res, groups, cols = NULL, pthresh=0.25) {
+  if (is.null(cols)) {
+    cols <- pal_npg()(length(groups))
+  }
+
+  da_plot <- maaslin_res %>%
+    mutate(enriched_in = ifelse(coef > 0, groups[2],
+                                groups[1])) %>%
+    # species name
+    mutate(species = str_extract(feature, "(?<=s__).*")) %>%
+    filter(qval <= pthresh)
+
+  da_plot$species <- gsub("\\.", " ", da_plot$species)
+
+  da_plot_sort <- da_plot %>%
+    arrange(coef) %>%
+    mutate(species = factor(species, levels = species))
+
+
+  p <-
+    ggplot(da_plot_sort,
+           aes(x = species, y = coef, color = enriched_in)) +
+    geom_point(size = 5) +
+    labs(y = paste("coeffiecient", groups[1], "vs", groups[2], sep =
+                     " "),
+         x = "") +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(color = "black", size = 14),
+      axis.text.y = element_text(color = "black", size = 14),
+      axis.title.y = element_text(size = 16),
+      axis.title.x = element_text(size = 16),
+      legend.text = element_text(size = 14),
+      legend.title = element_text(size = 14),
+      legend.position = "none"
+    ) +
+    coord_flip() +
+    geom_hline(yintercept = 0, linetype = "dotted") +
+    scale_color_manual(values = cols)
+  print(p)
+}
+

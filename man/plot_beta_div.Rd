@@ -8,6 +8,7 @@ plot_beta_div(
   ps,
   dist_matrix,
   beta_div,
+  group_variable,
   add_ellipse = FALSE,
   cols = NULL,
   shape = NULL
@@ -20,6 +21,9 @@ plot_beta_div(
 
 \item{beta_div}{output of \code{calc_betadiv()}, containing the ordination and distance matrix.}
 
+\item{group_variable}{A character string specifying the metadata variable to use for
+grouping samples.}
+
 \item{add_ellipse}{A logical value indicating whether to add confidence ellipses around
 groups. Default is \code{FALSE}.}
 
@@ -27,9 +31,6 @@ groups. Default is \code{FALSE}.}
 
 \item{shape}{A character string specifying an optional metadata variable to use for
 point shapes. Default is \code{NULL}.}
-
-\item{group_variable}{A character string specifying the metadata variable to use for
-grouping samples.}
 }
 \value{
 A ggplot object representing the ordination plot with PERMANOVA statistics

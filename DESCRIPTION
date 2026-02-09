@@ -23,12 +23,14 @@ Imports:
     purrr,
     readr,
     rlang,
+    tibble,
     tidyr,
     vegan,
     zoo
 Suggests:
     cowplot,
     EnhancedVolcano,
+    factoextra,
     ggfortify,
     ggpubr,
     ggsci,

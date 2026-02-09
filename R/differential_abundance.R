@@ -26,6 +26,7 @@ maaslin2_tax <- function(tax_profile,
                          abun_thresh = 0,
                          prev_thresh = 0,
                          taxonomy = "metaphlan",
+                         cores=1,
                          ...) {
   mat_in <- ps_to_feattab(tax_profile) %>%
     t_df()
@@ -50,7 +51,7 @@ maaslin2_tax <- function(tax_profile,
     min_abundance = abun_thresh,
     min_prevalence = prev_thresh,
     fixed_effects = fixed,
-    cores = 6,
+    cores = cores,
     ...
   )
 }

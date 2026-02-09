@@ -446,7 +446,7 @@ plot_pcoa <- function(func_profile,
 #'
 #' @param ps A phyloseq object containing the microbiome data and sample metadata.
 #' @param dist_matrix A distance matrix (class "dist") calculated from the phyloseq object.
-#' @param ordination An ordination object (e.g., from `ordinate()` or `calc_betadiv()`).
+#' @param beta_div output of `calc_betadiv()`, containing the ordination and distance matrix.
 #' @param group_variable A character string specifying the metadata variable to use for
 #'   grouping samples.
 #' @param add_ellipse A logical value indicating whether to add confidence ellipses around
@@ -466,8 +466,7 @@ plot_pcoa <- function(func_profile,
 #' @export
 plot_beta_div <- function(ps,
                           dist_matrix,
-                          ordination,
-                          group_variable,
+                          beta_div
                           add_ellipse = FALSE,
                           cols = NULL,
                           shape = NULL) {
@@ -480,6 +479,10 @@ plot_beta_div <- function(ps,
   if (is.null(cols)) {
     cols <- calc_pal(ps, group_variable)
   }
+
+  ordination <- beta_div$Ordination
+  dist_matrix <- beta_div$Distance_Matrix
+
   # significance
   ad <- phyloseq_adonis(ps, dist_matrix, group_variable)
   betadisp <- phyloseq_betadisper(ps, dist_matrix, group_variable)

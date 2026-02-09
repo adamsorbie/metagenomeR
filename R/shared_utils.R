@@ -69,3 +69,31 @@ filter_rownames <- function(df, filt_vector) {
     column_to_rownames(var = "id")
   return(df_filt)
 }
+
+#' Generate Color Palette from Phyloseq Object
+#'
+#' This internal function generates a color palette based on the unique levels
+#' of a grouping variable in a phyloseq object's sample data.
+#'
+#' @param ps A phyloseq object containing sample metadata.
+#' @param group_variable A character string specifying the metadata variable
+#'   to use for determining the number of colors.
+#'
+#' @return A vector of colors from the NPG palette, or NULL with a message
+#'   if the number of groups exceeds the palette limit.
+#'
+#' @importFrom ggsci pal_npg
+#' @keywords internal
+calc_pal <- function(ps, group_variable) {
+  # update function to accept non-ps objects and add support for continuous palettes
+  meta <- meta_to_df(ps)
+  groups <- unique(meta[, group_variable])
+
+  if (length(groups) < 10) {
+    pal <- pal_npg()(length(groups))
+  } else {
+    message("Exceeded colour palette limit, use custom palette")
+    pal <- NULL
+  }
+  pal
+}

@@ -448,7 +448,6 @@ plot_pcoa <- function(func_profile,
 #' homogeneity of group dispersions and warns if significant.
 #'
 #' @param ps A phyloseq object containing the microbiome data and sample metadata.
-#' @param dist_matrix A distance matrix (class "dist") calculated from the phyloseq object.
 #' @param beta_div output of `calc_betadiv()`, containing the ordination and distance matrix.
 #' @param group_variable A character string specifying the metadata variable to use for
 #'   grouping samples.
@@ -468,7 +467,6 @@ plot_pcoa <- function(func_profile,
 #'
 #' @export
 plot_beta_div <- function(ps,
-                          dist_matrix,
                           beta_div,
                           group_variable,
                           add_ellipse = FALSE,
@@ -610,8 +608,11 @@ plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
   }
 
   if (!is.null(ord)) {
-    ps <- ps %>%
-      ps_mutate(plot_var = factor(.data[[var]], levels = ord))
+    phyloseq::sample_data(ps)$plot_var <- factor(
+      phyloseq::sample_data(ps)[[rlang::as_name(var)]], levels = ord
+    )
+  } else {
+    phyloseq::sample_data(ps)$plot_var <- phyloseq::sample_data(ps)[[rlang::as_name(var)]]
   }
 
   if (agg == T){

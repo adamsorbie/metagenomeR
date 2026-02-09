@@ -4,14 +4,7 @@
 \alias{import_pseq_metag}
 \title{Import Phyloseq Object from Merged Table and Metadata}
 \usage{
-import_pseq_metag(
-  merged_table_path,
-  metapath,
-  level,
-  tax_format = "metaphlan",
-  table_comment_char = "#",
-  meta_comment_char = "#"
-)
+import_pseq_metag(merged_table_path, metapath, level, tax_format = "metaphlan")
 }
 \arguments{
 \item{merged_table_path}{A character string representing the file path of the merged count table.}

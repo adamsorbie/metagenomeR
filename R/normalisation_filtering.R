@@ -1,6 +1,19 @@
-transform <- function(ps,
-                      transform = "relative",
-                      offset = 1) {
+#' Transform taxonomic abundance data
+#'
+#' Apply transformations to taxonomic abundance data in a phyloseq object.
+#'
+#' @param ps A phyloseq object containing taxonomic abundance data.
+#' @param transform Character string specifying the transformation to apply.
+#'   One of "relative", "arcsin", or "log10". Default is "relative".
+#' @param offset Numeric offset to add before log10 transformation to avoid
+#'   log of zero. Default is 1.
+#'
+#' @return A phyloseq object with transformed abundance data.
+#'
+#' @export
+transform_tax <- function(ps,
+                          transform = "relative",
+                          offset = 1) {
   if (length(is(ps)) == 1 && class(ps) == "phyloseq") {
     x <- ps_to_feattab(ps)
     mean_sum <- mean(colSums(x))
@@ -60,7 +73,7 @@ filter_ps <- function(ps, abun, prev = NULL) {
 
 subset_samples_func <- function(func_profile, filter_statement) {
   keep <- func_profile$Metadata %>%
-    filter(eval(rlang::parse_expr(filter_statement))) %>%
+    dplyr::filter(eval(rlang::parse_expr(filter_statement))) %>%
     rownames()
 
   func_profile_filt <- map(func_profile, function(x)

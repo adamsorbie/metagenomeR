@@ -2,7 +2,7 @@
 % Please edit documentation in R/functional_utils.R
 \name{import_func_profile}
 \alias{import_func_profile}
-\title{Read Tab-Delimited Metagenomics File}
+\title{Import Functional Profile}
 \usage{
 import_func_profile(
   meta,
@@ -34,18 +34,12 @@ import_func_profile(
 \item{read}{A logical value indicating whether to read the input data from files. Default is \code{FALSE}.}
 
 \item{fix_names}{A logical value indicating whether to clean the sample names by removing suffixes. Default is \code{TRUE}.}
-
-\item{df}{A character string representing the file path of the tab-delimited file.
-
-Import Functional Profile
-
-This function imports functional profiles (such as UniRef, EC, KO, and pathways), processes them, and applies optional filtering and renormalization.}
 }
 \value{
 A list containing the processed UniRef, EC, KO, and pathway functional profiles.
 }
 \description{
-This function reads a tab-delimited file into a data frame using specific parameters, such as no quotes and not checking column names.
+This function imports functional profiles (such as UniRef, EC, KO, and pathways), processes them, and applies optional filtering and renormalization.
 }
 \examples{
 # Example usage:

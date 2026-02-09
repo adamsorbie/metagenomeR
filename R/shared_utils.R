@@ -28,6 +28,7 @@ t_df <- function(x) {
 #' # Example usage:
 #' metag_data <- read_tab_delim_metag("data/tab_delimited_file.txt")
 #'
+#' @importFrom data.table fread
 #' @export
 read_tab_delim_metag <- function(df, comment_char) {
   # read all tab delimited files using these params
@@ -64,7 +65,7 @@ filter_rownames <- function(df, filt_vector) {
   # wrapper script around filter to handle rownames
   df_filt <- df %>%
     rownames_to_column(var = "id") %>%
-    filter(id %in% filt_vector) %>%
+    dplyr::filter(id %in% filt_vector) %>%
     column_to_rownames(var = "id")
   return(df_filt)
 }

@@ -53,13 +53,13 @@ import_func_profile <- function(meta,
 
   feat <- map(feat, function(x)
     x %>%
-      select(all_of(sample_names)))
+      dplyr::select(all_of(sample_names)))
 
   if (filter_ungrouped == TRUE) {
     feat <- map(feat, function(x)
       x %>%
         rownames_to_column("tmp") %>%
-        filter(!tmp %in% c(
+        dplyr::filter(!tmp %in% c(
           "UNGROUPED", "UNMAPPED", "UNINTEGRATED"
         )) %>%
         column_to_rownames("tmp"))

@@ -89,7 +89,7 @@ stat_plot <- function(df,
         ) %>%
         add_significance() %>%
         add_xy_position(x = variable_col) %>%
-        filter(p.adj < 0.05)
+        dplyr::filter(p.adj < 0.05)
     }
     else {
       stat_variance <- df %>%
@@ -100,7 +100,7 @@ stat_plot <- function(df,
                              p.adjust.method = "BH") %>%
         add_significance() %>%
         add_xy_position(x = variable_col) %>%
-        filter(p.adj < 0.05)
+        dplyr::filter(p.adj < 0.05)
     }
   }
   else if (multiple_groups == FALSE) {
@@ -109,14 +109,14 @@ stat_plot <- function(df,
         wilcox_test(formula, paired = TRUE) %>%
         add_significance() %>%
         add_xy_position(x = variable_col) %>%
-        filter(p < 0.05)
+        dplyr::filter(p < 0.05)
     }
     else {
       stat_test <- df %>%
         wilcox_test(formula) %>%
         add_significance() %>%
         add_xy_position(x = variable_col) %>%
-        filter(p < 0.05)
+        dplyr::filter(p < 0.05)
     }
 
   }
@@ -344,11 +344,11 @@ plot_pca <- function(func_profile,
                      colours,
                      add_ellipse = F) {
   # calc PCA
-  metadata_filt <- func_profile[["Metadata"]] %>% select(all_of(var))
+  metadata_filt <- func_profile[["Metadata"]] %>% dplyr::select(all_of(var))
   dat <- merge(func_profile[[what]], metadata_filt, by = 0) %>%
     column_to_rownames("Row.names")
   # this will select numerical metadata
-  pca <- prcomp(dat %>% select(where(is.numeric)), scale. = T)
+  pca <- prcomp(dat %>% dplyr::select(where(is.numeric)), scale. = T)
 
 
   # Plot
@@ -513,12 +513,12 @@ plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
       psmelt()
   }
 
-  taxa_plot <- melt_ps %>% filter(OTU %in% top_tax)
+  taxa_plot <- melt_ps %>% dplyr::filter(OTU %in% top_tax)
 
   # group rest into other
   repl_cols <- c("OTU", ranks)
 
-  other_plot <- melt_ps %>% filter(!OTU %in% top_tax) %>%
+  other_plot <- melt_ps %>% dplyr::filter(!OTU %in% top_tax) %>%
     group_by(Sample) %>%
     mutate(Abundance = sum(Abundance)) %>%
     ungroup %>%
@@ -529,7 +529,7 @@ plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
   plot_df <- bind_rows(taxa_plot, other_plot)
 
   taxa_pal <- c(stacked_bar.palette[1:length(top_tax)-1], "#DCDCDC", "white")
-  names(taxa_pal) <- plot_df %>% filter(OTU %in% top_tax) %>%
+  names(taxa_pal) <- plot_df %>% dplyr::filter(OTU %in% top_tax) %>%
     pull(.data[[ tax_level ]]) %>%
     unique()
 

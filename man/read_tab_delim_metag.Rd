@@ -4,7 +4,7 @@
 \alias{read_tab_delim_metag}
 \title{Read a Tab-Delimited Metagenomics File}
 \usage{
-read_tab_delim_metag(df)
+read_tab_delim_metag(df, comment_char)
 }
 \arguments{
 \item{df}{A character string representing the file path of the tab-delimited file.}

@@ -83,12 +83,12 @@ get_top_n <- function(ps, n, level = "species", agg = F) {
   }
 
   topn <- ps %>%
-    transform(transform = "relative") %>%
+    transform_tax(transform = "relative") %>%
     psmelt() %>%
     group_by(OTU) %>%
     summarise(Mean_abund = mean(Abundance)) %>%
     # remove those with zero abundance
-    filter(Mean_abund > 0) %>%
+    dplyr::filter(Mean_abund > 0) %>%
     slice_max(Mean_abund, n = n) %>%
     pull(OTU)
   return(topn)
@@ -125,13 +125,13 @@ get_top_n_group <- function(ps,
     ps <- ps_get(ps)
   }
   topn <- ps %>%
-    transform(transform = "relative") %>%
+    transform_tax(transform = "relative") %>%
     psmelt() %>%
-    filter({{ var }} == {{ group }}) %>%
+    dplyr::filter({{ var }} == {{ group }}) %>%
     group_by(OTU) %>%
     summarise(Mean_abund = mean(Abundance)) %>%
     # remove those with zero abundance
-    filter(Mean_abund > 0) %>%
+    dplyr::filter(Mean_abund > 0) %>%
     slice_max(Mean_abund, n = n) %>%
     pull(OTU)
 
@@ -277,10 +277,10 @@ select_rank <- function(merged_table, level, tax_format = "metaphlan") {
   tax_table_out <- tax_table_fill %>%
     rowwise() %>%
     separate(Subspecies, into = c("Level", "tmp"), sep = "_") %>%
-    select(-tmp) %>%
-    filter(Level == level) %>%
+    dplyr::select(-tmp) %>%
+    dplyr::filter(Level == level) %>%
     column_to_rownames("taxa") %>%
-    select(-Level)
+    dplyr::select(-Level)
 
   merged_table_out <- merged_table %>%
     rownames_to_column("taxa") %>%
@@ -337,12 +337,12 @@ get_top_n <- function(ps, n, level = "species", agg=F) {
   }
 
   topn <- ps %>%
-    transform(transform = "relative") %>%
+    transform_tax(transform = "relative") %>%
     psmelt() %>%
     group_by(OTU) %>%
     summarise(Mean_abund = mean(Abundance)) %>%
     # remove those with zero abundance
-    filter(Mean_abund > 0) %>%
+    dplyr::filter(Mean_abund > 0) %>%
     slice_max(Mean_abund, n = n) %>%
     pull(OTU)
   return(topn)
@@ -356,13 +356,13 @@ get_top_n_group <- function(ps, n, level = "species",var,
     ps <- ps_get(ps)
   }
   topn <- ps %>%
-    transform(transform = "relative") %>%
+    transform_tax(transform = "relative") %>%
     psmelt() %>%
-    filter({{ var }} == {{ group }}) %>%
+    dplyr::filter({{ var }} == {{ group }}) %>%
     group_by(OTU) %>%
     summarise(Mean_abund = mean(Abundance)) %>%
     # remove those with zero abundance
-    filter(Mean_abund > 0) %>%
+    dplyr::filter(Mean_abund > 0) %>%
     slice_max(Mean_abund, n = n) %>%
     pull(OTU)
 

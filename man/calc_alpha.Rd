@@ -12,18 +12,19 @@ calc_alpha(
 \arguments{
 \item{ps}{phyloseq object}
 
-\item{indices}{Alpha-diversity indices to calculate. Supported metrics are \code{"Richness"},\code{"Shannon.Effective"}, \code{"Shannon"} and \code{"Inverse.Simpson"}}
+\item{indices}{Alpha-diversity indices to calculate. Supported metrics are: \cr
+\code{"Richness"},\code{"Shannon.Effective"}, \code{"Shannon"} and \code{"Inverse.Simpson"}}
 }
 \value{
-Returns the specified alpha diversity metrics for each sample as a dataframe
+Returns specified alpha-diversity metrics as a dataframe
 }
 \description{
 Calculate alpha-diversity indices from a phyloseq object
 }
 \examples{
-
 data(zeller_2014)
-alpha_div <- alpha_div(zeller_2014)
-Only richness
-alpha_div <- alpha_div(zeller_2014, indices=c("Richness"))
+alpha_div <- calc_alpha(zeller_2014)
+# Only richness
+alpha_div <- calc_alpha(zeller_2014, indices = c("Richness"))
+
 }

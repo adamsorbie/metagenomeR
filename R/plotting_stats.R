@@ -220,7 +220,7 @@ plot_boxplot <- function(df,
                  width = 0.2)
   # creates new 'finalised plot' and adds statistical significance, labels and adjusts theme and title
   final_plot <- plot +
-    theme_classic2() +
+    theme_cowplot() +
     ggtitle(p_title) +
     theme(
       axis.text.x = element_text(size = 14),
@@ -301,7 +301,7 @@ plot_scatter <- function(df,
     geom_smooth(method = "lm",
                 color = line_color,
                 fill = fill_color) +
-    theme_bw() +
+    theme_cowplot() +
     theme(
       legend.position = "None",
       axis.title.x = element_text(size = 14),

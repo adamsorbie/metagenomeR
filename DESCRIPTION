@@ -23,6 +23,7 @@ Imports:
     purrr,
     readr,
     rlang,
+    rstatix,
     tibble,
     tidyr,
     vegan,
@@ -35,7 +36,6 @@ Suggests:
     ggpubr,
     ggsci,
     lemon,
-    rstatix,
     scales,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

@@ -3,7 +3,7 @@
 test_that("calc_betadiv returns list with distance matrix and ordination", {
   skip_if_not_installed("vegan")
 
-  result <- calc_betadiv(zeller_2014, dist = "bray", ord_method = "NMDS")
+  result <- calc_betadiv(zeller2014, dist = "bray", ord_method = "NMDS")
 
   expect_type(result, "list")
   expect_true("Distance_Matrix" %in% names(result))
@@ -13,10 +13,10 @@ test_that("calc_betadiv returns list with distance matrix and ordination", {
 test_that("calc_betadiv distance matrix has correct dimensions", {
   skip_if_not_installed("vegan")
 
-  result <- calc_betadiv(zeller_2014, dist = "bray", ord_method = "MDS")
+  result <- calc_betadiv(zeller2014, dist = "bray", ord_method = "MDS")
 
   dist_mat <- result$Distance_Matrix
-  n_samples <- phyloseq::nsamples(zeller_2014)
+  n_samples <- phyloseq::nsamples(zeller2014)
 
   expect_s3_class(dist_mat, "dist")
   expect_equal(attr(dist_mat, "Size"), n_samples)
@@ -25,7 +25,7 @@ test_that("calc_betadiv distance matrix has correct dimensions", {
 test_that("calc_betadiv works with jaccard distance", {
   skip_if_not_installed("vegan")
 
-  result <- calc_betadiv(zeller_2014, dist = "jaccard", ord_method = "MDS")
+  result <- calc_betadiv(zeller2014, dist = "jaccard", ord_method = "MDS")
 
   expect_type(result, "list")
   expect_s3_class(result$Distance_Matrix, "dist")
@@ -34,7 +34,7 @@ test_that("calc_betadiv works with jaccard distance", {
 test_that("calc_betadiv works with PCoA ordination", {
   skip_if_not_installed("vegan")
 
-  result <- calc_betadiv(zeller_2014, dist = "bray", ord_method = "PCoA")
+  result <- calc_betadiv(zeller2014, dist = "bray", ord_method = "PCoA")
 
   expect_type(result, "list")
   expect_true(!is.null(result$Ordination))
@@ -45,7 +45,7 @@ test_that("calc_betadiv errors on unsupported distance metric", {
 
   # Should print error message for unsupported distance
   expect_output(
-    calc_betadiv(zeller_2014, dist = "euclidean", ord_method = "NMDS"),
+    calc_betadiv(zeller2014, dist = "euclidean", ord_method = "NMDS"),
     "Distance metric not supported"
   )
 })
@@ -54,7 +54,7 @@ test_that("calc_betadiv errors on unsupported ordination method", {
   skip_if_not_installed("vegan")
 
   expect_error(
-    calc_betadiv(zeller_2014, dist = "bray", ord_method = "INVALID")
+    calc_betadiv(zeller2014, dist = "bray", ord_method = "INVALID")
   )
 })
 
@@ -68,7 +68,7 @@ test_that("phyloseq_adonis performs PERMANOVA test", {
   skip_if_not_installed("vegan")
 
   # First calculate distance matrix
-  beta_result <- calc_betadiv(zeller_2014, dist = "bray", ord_method = "MDS")
+  beta_result <- calc_betadiv(zeller2014, dist = "bray", ord_method = "MDS")
 
   # Note: Due to the deparse(substitute()) bug in phyloseq_adonis,
 
@@ -76,7 +76,7 @@ test_that("phyloseq_adonis performs PERMANOVA test", {
   # We assign to a specific name and test if it works
   result <- tryCatch({
     dist_matrix <- beta_result$Distance_Matrix
-    phyloseq_adonis(zeller_2014, dist_matrix, group_variable = "Gender")
+    phyloseq_adonis(zeller2014, dist_matrix, group_variable = "Gender")
   }, error = function(e) {
     # Known bug: deparse(substitute()) doesn't work as expected
     skip("phyloseq_adonis has a bug with deparse(substitute()) - variable name not found")
@@ -102,10 +102,10 @@ test_that("phyloseq_adonis returns NULL when metadata has NAs", {
 test_that("phyloseq_betadisper performs beta dispersion test", {
   skip_if_not_installed("vegan")
 
-  beta_result <- calc_betadiv(zeller_2014, dist = "bray", ord_method = "MDS")
+  beta_result <- calc_betadiv(zeller2014, dist = "bray", ord_method = "MDS")
   dist_mat <- beta_result$Distance_Matrix
 
-  result <- phyloseq_betadisper(zeller_2014, dist_mat, group_variable = "Gender")
+  result <- phyloseq_betadisper(zeller2014, dist_mat, group_variable = "Gender")
 
   # Should return ANOVA result
   expect_true(!is.null(result))
@@ -115,10 +115,10 @@ test_that("phyloseq_betadisper performs beta dispersion test", {
 test_that("phyloseq_betadisper returns NULL when metadata has NAs", {
   skip_if_not_installed("vegan")
 
-  beta_result <- calc_betadiv(zeller_2014, dist = "bray", ord_method = "MDS")
+  beta_result <- calc_betadiv(zeller2014, dist = "bray", ord_method = "MDS")
   dist_mat <- beta_result$Distance_Matrix
 
   # Test with valid data - function should work
-  result <- phyloseq_betadisper(zeller_2014, dist_mat, group_variable = "Gender")
+  result <- phyloseq_betadisper(zeller2014, dist_mat, group_variable = "Gender")
   expect_true(!is.null(result) || is.null(result))  # Either valid depending on data
 })

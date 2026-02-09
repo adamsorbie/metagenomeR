@@ -22,10 +22,10 @@ richness <- function(x, detection = 1e-5) {
 #' @return Returns specified alpha-diversity metrics as a dataframe
 #'
 #' @examples
-#' data(zeller_2014)
-#' alpha_div <- calc_alpha(zeller_2014)
+#' data(zeller2014)
+#' alpha_div <- calc_alpha(zeller2014)
 #' # Only richness
-#' alpha_div <- calc_alpha(zeller_2014, indices = c("Richness"))
+#' alpha_div <- calc_alpha(zeller2014, indices = c("Richness"))
 #'
 #' @export
 calc_alpha <- function(ps, ...) {

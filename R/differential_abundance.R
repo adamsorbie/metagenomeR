@@ -18,6 +18,7 @@
 #' # Example usage:
 #' maaslin2_tax(tax_profile, out = "maaslin2_output", fixed = c("age", "sex"))
 #'
+#' @importFrom Maaslin2 Maaslin2
 #' @export
 maaslin2_tax <- function(tax_profile,
                          out,

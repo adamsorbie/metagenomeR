@@ -62,6 +62,7 @@ check_equal_sample_sizes <- function(df, variable_col) {
 #' # Example usage:
 #' stat_results <- stat_plot(df, formula = y ~ x, variable_col = "group")
 #'
+#' @importFrom rstatix wilcox_test kruskal_test friedman_test pairwise_wilcox_test add_significance add_xy_position
 #' @export
 stat_plot <- function(df,
                       formula,
@@ -437,6 +438,81 @@ plot_pcoa <- function(func_profile,
 
 }
 
+#' Plot Beta Diversity Ordination with Statistical Annotations
+#'
+#' This function creates a beta diversity ordination plot (PCoA/NMDS) from a phyloseq
+#' object with PERMANOVA (adonis) results displayed as a caption. It also checks for
+#' homogeneity of group dispersions and warns if significant.
+#'
+#' @param ps A phyloseq object containing the microbiome data and sample metadata.
+#' @param dist_matrix A distance matrix (class "dist") calculated from the phyloseq object.
+#' @param ordination An ordination object (e.g., from `ordinate()` or `calc_betadiv()`).
+#' @param group_variable A character string specifying the metadata variable to use for
+#'   grouping samples.
+#' @param add_ellipse A logical value indicating whether to add confidence ellipses around
+#'   groups. Default is `FALSE`.
+#' @param cols A vector of colors to use for the groups. Default is `NULL` (auto-generated).
+#' @param shape A character string specifying an optional metadata variable to use for
+#'   point shapes. Default is `NULL`.
+#'
+#' @return A ggplot object representing the ordination plot with PERMANOVA statistics
+#'   in the caption.
+#'
+#' @examples
+#' # Example usage:
+#' # beta <- calc_betadiv(ps, dist = "bray", ord_method = "PCoA")
+#' # plot_beta_div(ps, beta$Distance_Matrix, beta$Ordination, "Treatment")
+#'
+#' @export
+plot_beta_div <- function(ps,
+                          dist_matrix,
+                          ordination,
+                          group_variable,
+                          add_ellipse = FALSE,
+                          cols = NULL,
+                          shape = NULL) {
+
+
+  if (!inherits(ps, "phyloseq")) {
+    stop("Input 'ps' must be a phyloseq object")
+  }
+
+  if (is.null(cols)) {
+    cols <- calc_pal(ps, group_variable)
+  }
+  # significance
+  ad <- phyloseq_adonis(ps, dist_matrix, group_variable)
+  betadisp <- phyloseq_betadisper(ps, dist_matrix, group_variable)
+
+  # check sample data dimensions >1 otherwise phyloseq
+  # fails to colour samples due to bug:https://github.com/joey711/phyloseq/issues/541
+  if (dim(sample_data(ps))[2] < 2) {
+    # add repeat of first column as dummy
+    sample_data(ps)[, 2] <- sample_data(ps)[, 1]
+  }
+  plot <- plot_ordination(ps, ordination , color = group_variable,  shape = shape)
+  plot$layers[[1]] <- NULL
+
+  plot_out <- plot + geom_point(size = 3, alpha = 0.75) +
+    theme_bw() +
+    scale_fill_manual(values = cols) +
+    scale_color_manual(values = cols) +
+    labs(caption = bquote(Adonis ~ R ^ 2 ~ .(round(ad$R2[1], 2)) ~
+                            ~ p - value ~ .(ad$`Pr(>F)`[1])))
+  if (add_ellipse == TRUE){
+    plot_out <- plot_out +
+      geom_polygon(stat = "ellipse", aes(fill = .data [[ group_variable ]] ), alpha = 0.3)
+  }
+
+  # ideally this needs to be added to the main plot eventually underneath adonis
+  if (betadisp$`Pr(>F)`[[1]] < 0.05){
+    warning("Group dispersion is not homogenous, interpret results carefully",
+            call. = F)
+  }
+
+  return(plot_out)
+}
+
 #' Plot Volcano Plot for Differential Analysis
 #'
 #' This function generates a volcano plot from a results data frame, showing fold changes and adjusted p-values. It highlights significant features based on specified thresholds.
@@ -480,6 +556,33 @@ plot_volcano <- function(results_df,
   )
 }
 
+#' Plot Taxonomic Composition as Stacked Bar Chart
+#'
+#' This function creates a stacked bar chart showing the relative abundance of taxa
+#' at a specified taxonomic level, faceted by a grouping variable.
+#'
+#' @param ps A phyloseq object containing the taxonomic data.
+#' @param tax_level A character string specifying the taxonomic rank to plot.
+#'   Must be one of: "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species".
+#' @param var A character string or symbol specifying the metadata variable to facet by.
+#' @param ord A character vector specifying the order of factor levels for the grouping
+#'   variable. Default is `NULL` (uses default ordering).
+#' @param n_taxa An integer specifying the number of top taxa to display. Default is `10`.
+#' @param per_group A logical value indicating whether to select top taxa per group
+#'   rather than overall. Default is `FALSE`.
+#' @param groups A character vector of group names to use when `per_group = TRUE`.
+#'   Default is `NULL`.
+#' @param agg A logical value indicating whether to aggregate taxa at the specified
+#'   taxonomic level before plotting. Default is `FALSE`.
+#'
+#' @return A ggplot object representing the stacked bar chart of taxonomic composition.
+#'
+#' @examples
+#' # Example usage:
+#' # comp_plot <- plot_taxonomic_comp(ps, "Phylum", "Treatment", n_taxa = 8)
+#' # comp_plot <- plot_taxonomic_comp(ps, "Genus", "Group", ord = c("Control", "Treatment"))
+#'
+#' @export
 plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
                                  per_group=F, groups=NULL, agg=F) {
   ranks <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")

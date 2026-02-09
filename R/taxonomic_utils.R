@@ -8,8 +8,8 @@
 #'
 #' @examples
 #' # Example usage:
-#' data(zeller_2014)
-#' taxa <- taxonomy(zeller_2014)
+#' data(zeller2014)
+#' taxa <- taxonomy(zeller2014)
 #'
 #' @export
 taxonomy <- function (ps) {

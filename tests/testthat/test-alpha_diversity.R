@@ -66,32 +66,32 @@ test_that("richness handles all zeros", {
   expect_equal(result, 0)
 })
 
-# Tests for calc_alpha() with zeller_2014 data
+# Tests for calc_alpha() with zeller2014 data
 # Note: These tests may fail if the bugs in calc_alpha are not fixed
 test_that("calc_alpha returns data frame with correct dimensions", {
   skip_if_not_installed("vegan")
 
   # This may fail due to bugs in calc_alpha (Richness vs richness)
   result <- tryCatch(
-    calc_alpha(zeller_2014),
+    calc_alpha(zeller2014),
     error = function(e) NULL
   )
 
   skip_if(is.null(result), "calc_alpha has bugs that need fixing")
 
   expect_s3_class(result, "data.frame")
-  expect_equal(nrow(result), phyloseq::nsamples(zeller_2014))
+  expect_equal(nrow(result), phyloseq::nsamples(zeller2014))
 })
 
 test_that("calc_alpha preserves sample names", {
   skip_if_not_installed("vegan")
 
   result <- tryCatch(
-    calc_alpha(zeller_2014),
+    calc_alpha(zeller2014),
     error = function(e) NULL
   )
 
   skip_if(is.null(result), "calc_alpha has bugs that need fixing")
 
-  expect_equal(rownames(result), phyloseq::sample_names(zeller_2014))
+  expect_equal(rownames(result), phyloseq::sample_names(zeller2014))
 })

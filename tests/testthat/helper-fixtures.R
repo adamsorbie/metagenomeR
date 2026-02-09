@@ -15,8 +15,8 @@ suppressPackageStartupMessages({
   }
 })
 
-# Load the zeller_2014 sample data
-data("zeller_2014", package = "metagenomeR")
+# Load the zeller2014 sample data
+data("zeller2014", package = "metagenomeR")
 
 # Create a simple mock functional profile for testing
 create_mock_func_profile <- function() {

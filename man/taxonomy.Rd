@@ -17,7 +17,7 @@ This function extracts the taxonomy table from a phyloseq object and converts it
 }
 \examples{
 # Example usage:
-data(zeller_2014)
-taxa <- taxonomy(zeller_2014)
+data(zeller2014)
+taxa <- taxonomy(zeller2014)
 
 }

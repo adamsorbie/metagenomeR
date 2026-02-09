@@ -42,5 +42,6 @@ calc_alpha <- function(ps, ...) {
   diversity$Shannon <- apply(mat_in, 1, function(x) diversity(x))
   diversity$Inverse.Simpson <- apply(mat_in, 1, function(x) diversity(x, index = "invsimpson"))
 
-  return(diversity)
+  diversity_out <- merge(diversity, meta_to_df(ps), by=0)
+  return(diversity_out)
 }

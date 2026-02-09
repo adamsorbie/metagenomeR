@@ -466,7 +466,7 @@ plot_pcoa <- function(func_profile,
 #' @export
 plot_beta_div <- function(ps,
                           dist_matrix,
-                          beta_div
+                          beta_div,
                           add_ellipse = FALSE,
                           cols = NULL,
                           shape = NULL) {

@@ -19,8 +19,6 @@ richness <- function(x, detection = 1e-5) {
 #' Calculate alpha-diversity indices from a phyloseq object
 #'
 #' @param ps phyloseq object
-#' @param indices Alpha-diversity indices to calculate. Supported metrics are: \cr
-#' `"Richness"`,`"Shannon.Effective"`, `"Shannon"` and `"Inverse.Simpson"`
 #' @return Returns specified alpha-diversity metrics as a dataframe
 #'
 #' @examples
@@ -30,32 +28,19 @@ richness <- function(x, detection = 1e-5) {
 #' alpha_div <- calc_alpha(zeller_2014, indices = c("Richness"))
 #'
 #' @export
-calc_alpha <- function(ps,
-                       indices = c("Richness", "Shannon.Effective", "Shannon", "Inverse.Simpson")) {
+calc_alpha <- function(ps, ...) {
   mat_in <- ps_to_feattab(ps) %>%
     t()
-  if (length(indices < 4)) {
-    if (indices %in% c("Richness",
-                       "Shannon.Effective",
-                       "Shannon",
-                       "Inverse.Simpson")) {
 
-    }
-  } else {
-
-  }
   diversity <-
-    setNames(data.frame(matrix(
-      ncol = length(indices), nrow = nsamples(ps)
-    )), indices)
+    setNames(data.frame(matrix(ncol = 4, nrow = nsamples(ps))),
+             c("Richness", "Shannon.Effective", "Shannon", "Inverse.Simpson"))
   rownames(diversity) <- rownames(meta_to_df(ps))
 
-  diversity$Richness <- apply(mat_in, 1, Richness)
-  diversity$Shannon.Effective <- apply(mat_in, 1, Shannon.E)
-  diversity$Shannon <- apply(mat_in, 1, function(x)
-    diversity(x, index = "shannon"))
-  diversity$InvSimpson <- apply(mat_in, 1, function(x)
-    diversity(x, index = "invsimpson"))
+  diversity$Richness <- apply(mat_in, 1, richness, ...)
+  diversity$Shannon.Effective <- apply(mat_in, 1, shannon_e)
+  diversity$Shannon <- apply(mat_in, 1, function(x) diversity(x))
+  diversity$Inverse.Simpson <- apply(mat_in, 1, function(x) diversity(x, index = "invsimpson"))
 
   return(diversity)
 }

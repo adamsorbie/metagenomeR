@@ -7,8 +7,7 @@
 plot_beta_div(
   ps,
   dist_matrix,
-  ordination,
-  group_variable,
+  beta_div,
   add_ellipse = FALSE,
   cols = NULL,
   shape = NULL
@@ -19,10 +18,7 @@ plot_beta_div(
 
 \item{dist_matrix}{A distance matrix (class "dist") calculated from the phyloseq object.}
 
-\item{ordination}{An ordination object (e.g., from \code{ordinate()} or \code{calc_betadiv()}).}
-
-\item{group_variable}{A character string specifying the metadata variable to use for
-grouping samples.}
+\item{beta_div}{output of \code{calc_betadiv()}, containing the ordination and distance matrix.}
 
 \item{add_ellipse}{A logical value indicating whether to add confidence ellipses around
 groups. Default is \code{FALSE}.}
@@ -31,6 +27,9 @@ groups. Default is \code{FALSE}.}
 
 \item{shape}{A character string specifying an optional metadata variable to use for
 point shapes. Default is \code{NULL}.}
+
+\item{group_variable}{A character string specifying the metadata variable to use for
+grouping samples.}
 }
 \value{
 A ggplot object representing the ordination plot with PERMANOVA statistics

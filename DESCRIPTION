@@ -15,6 +15,7 @@ BugReports: https://github.com/adamsorbie/metagenomeR/issues
 Depends:
     R (>= 4.0.0)
 Imports:
+    cowplot,
     data.table,
     dplyr,
     ggplot2,
@@ -29,7 +30,6 @@ Imports:
     vegan,
     zoo
 Suggests:
-    cowplot,
     EnhancedVolcano,
     factoextra,
     ggfortify,

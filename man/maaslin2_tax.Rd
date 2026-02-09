@@ -11,6 +11,7 @@ maaslin2_tax(
   abun_thresh = 0,
   prev_thresh = 0,
   taxonomy = "metaphlan",
+  cores = 1,
   ...
 )
 }

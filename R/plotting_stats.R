@@ -63,6 +63,7 @@ check_equal_sample_sizes <- function(df, variable_col) {
 #' stat_results <- stat_plot(df, formula = y ~ x, variable_col = "group")
 #'
 #' @importFrom rstatix wilcox_test kruskal_test friedman_test pairwise_wilcox_test add_significance add_xy_position
+#' @importFrom cowplot theme_cowplot
 #' @export
 stat_plot <- function(df,
                       formula,

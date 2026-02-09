@@ -4,7 +4,7 @@ R package for analysis of read-based shotgun metagenomic data
 
 ### Installation 
 
-#### Installing from GitHub requires the devtools package
+Installing from GitHub requires the devtools package
 
 ``` r
 install.packages("devtools")

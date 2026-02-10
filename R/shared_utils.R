@@ -97,3 +97,52 @@ calc_pal <- function(ps, group_variable) {
   }
   pal
 }
+#' Custom colour palette for stacked barplots
+#'
+#' A character vector of 30 hex colour codes designed for visualizing
+#' taxonomic composition in stacked barplots. The first 10 colours are
+#' from the NPG (Nature Publishing Group) palette, with additional
+#' distinguishable colours for datasets with many taxa.
+#'
+#' @format A character vector of length 30 containing hex colour codes.
+#'
+#' @examples
+#' # Use with ggplot2 scale_fill_manual
+#' # scale_fill_manual(values = stacked_bar_palette)
+#'
+#' # Preview the palette
+#' scales::show_col(stacked_bar_palette)
+#'
+#' @export
+stacked_bar_palette <- c(
+  "#E64B35FF",
+  "#4DBBD5FF",
+  "#00A087FF",
+  "#3C5488FF",
+  "#F39B7FFF",
+  "#8491B4FF",
+  "#91D1C2FF",
+  "#DC0000FF",
+  "#7E6148FF",
+  "#B09C85FF",
+  "#E4E9B2",
+  "#F9A620",
+  "#054A29",
+  "#52414C",
+  "#D81E5B",
+  "#331832",
+  "#27474E",
+  "#573D1C",
+  "#404E4D",
+  "#DAD4EF",
+  "#E86A92",
+  "#044389",
+  "#6C4B5E",
+  "#4E6E58",
+  "#826AED",
+  "#FF0054",
+  "#9E0059",
+  "#387D7A",
+  "#395E66",
+  "#1BE7FF"
+)

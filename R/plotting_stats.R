@@ -639,7 +639,7 @@ plot_taxonomic_comp  <- function(ps, tax_level, var, ord=NULL, n_taxa=10,
   # bind dfs
   plot_df <- bind_rows(taxa_plot, other_plot)
 
-  taxa_pal <- c(stacked_bar.palette[1:length(top_tax)-1], "#DCDCDC", "white")
+  taxa_pal <- c(stacked_bar_palette[1:length(top_tax)-1], "#DCDCDC", "white")
   names(taxa_pal) <- plot_df %>% dplyr::filter(OTU %in% top_tax) %>%
     pull(.data[[ tax_level ]]) %>%
     unique()

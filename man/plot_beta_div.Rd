@@ -6,7 +6,6 @@
 \usage{
 plot_beta_div(
   ps,
-  dist_matrix,
   beta_div,
   group_variable,
   add_ellipse = FALSE,
@@ -16,8 +15,6 @@ plot_beta_div(
 }
 \arguments{
 \item{ps}{A phyloseq object containing the microbiome data and sample metadata.}
-
-\item{dist_matrix}{A distance matrix (class "dist") calculated from the phyloseq object.}
 
 \item{beta_div}{output of \code{calc_betadiv()}, containing the ordination and distance matrix.}
 

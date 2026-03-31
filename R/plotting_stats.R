@@ -80,6 +80,7 @@ stat_plot <- function(df,
 
   if (multiple_groups == TRUE) {
     if (paired == TRUE) {
+
       stat_variance <- df %>%
         friedman_test(formula)
       stat_test <- df %>%

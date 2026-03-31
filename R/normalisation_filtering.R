@@ -23,7 +23,7 @@ transform_tax <- function(ps,
     stop()
   }
 
-  if (transform %in% c("relative", "arcsin", "log10")) {
+  if (transform %in% c("relative", "arcsin", "clr", "log10")) {
     if (transform == "relative") {
       ps_t <- t(t(x) / colSums(x))
 
@@ -36,7 +36,12 @@ transform_tax <- function(ps,
       } else {
         stop("not proportion data, exiting")
       }
-    } else if (transform == "log10") {
+    } else if (transform == "clr") {
+      ps_t <- t(logratio.transfo(t(x + offset), logratio = "CLR"))
+      # fix mixOmics class issue
+      class(ps_t) <- "matrix"
+    }
+    else if (transform == "log10") {
       if (max_x == 100 | max_x == 1) {
         warning("data are relative abundances", call. = F)
         ps_t <- log10(x + offset)

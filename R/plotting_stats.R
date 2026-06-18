@@ -504,7 +504,7 @@ plot_beta_div <- function(ps,
     theme_bw() +
     scale_fill_manual(values = cols) +
     scale_color_manual(values = cols) +
-    labs(caption = bquote(Adonis ~ R ^ 2 ~ .(round(ad$R2[1], 2)) ~
+    labs(caption = bquote(Adonis ~ R ^ 2 ~ .(round(ad$R2[1], 3)) ~
                             ~ p - value ~ .(ad$`Pr(>F)`[1])))
   if (add_ellipse == TRUE){
     plot_out <- plot_out +

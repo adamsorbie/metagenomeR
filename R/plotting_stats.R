@@ -391,6 +391,7 @@ plot_pca <- function(func_profile,
 #' # Example usage:
 #' pcoa_plot <- plot_pcoa(func_profile, what = "KO", var = "Treatment", colours = c("red", "green"), add_ellipse = TRUE)
 #'
+#' @export
 plot_pcoa <- function(func_profile,
                       what,
                       var,

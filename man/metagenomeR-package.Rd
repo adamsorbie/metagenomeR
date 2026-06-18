@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Adam Sorbie \email{adamsorbie@pm.me}
 
+Authors:
+\itemize{
+  \item Adam Sorbie \email{adamsorbie@pm.me}
+}
+
 }
 \keyword{internal}
